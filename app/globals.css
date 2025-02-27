@@ -1,11 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Manrope:wght@200..800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -14,15 +9,15 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "Roboto", serif;
+  font-family: "Roboto", sans-serif;
 }
 
 .manrope {
-  font-family: "Manrope", serif;
+  font-family: "Manrope", sans-serif;
 }
 .inter {
-  font-family: "Inter", serif;
+  font-family: "Inter", sans-serif;
 }
 .roboto {
-  font-family: "Roboto", serif;
+  font-family: "Roboto", sans-serif;
 }

@@ -1,6 +1,6 @@
 const images = {
   authPage: {
-    loginBanner: "/assets/images/login-banner.png",
+    loginBanner: "/assets/images/login-banner.gif",
   },
 };
 

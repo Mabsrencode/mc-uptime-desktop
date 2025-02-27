@@ -2,8 +2,8 @@
 import images from "@/constants/images";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
-import { FaGithub } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaGithub, FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -20,8 +20,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Content = () => {
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
-
   const {
     register,
     handleSubmit,
@@ -60,7 +60,7 @@ const Content = () => {
   return (
     <section className="min-h-screen flex w-full">
       <div className="w-full lg:w-1/2 p-8">
-        <h1 className="font-extrabold text-primary-500 tracking-tighter text-2xl manrope">
+        <h1 className="font-bold text-green-500 tracking-tight text-2xl manrope">
           MC Uptime
         </h1>
         <div className="h-full w-full flex justify-center items-center">
@@ -90,7 +90,9 @@ const Content = () => {
                   {...register("email")}
                 />
                 {errors.email && (
-                  <p className="text-red-500 text-sm">{errors.email.message}</p>
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
 
@@ -101,13 +103,26 @@ const Content = () => {
                 >
                   Password
                 </label>
-                <input
-                  className="w-full py-3 px-6 border border-borderColor outline-none"
-                  type="password"
-                  {...register("password")}
-                />
+                <div className="relative">
+                  {showPassword ? (
+                    <FaRegEye
+                      className="absolute cursor-pointer right-4 top-[13px] text-2xl"
+                      onClick={() => setShowPassword(!showPassword)}
+                    />
+                  ) : (
+                    <FaRegEyeSlash
+                      className="absolute cursor-pointer right-4 top-[13px] text-2xl"
+                      onClick={() => setShowPassword(!showPassword)}
+                    />
+                  )}
+                  <input
+                    className="w-full py-3 pl-6 pr-12 border border-borderColor outline-none"
+                    type={showPassword ? "text" : "password"}
+                    {...register("password")}
+                  />
+                </div>
                 {errors.password && (
-                  <p className="text-red-500 text-sm">
+                  <p className="text-red-500 text-xs mt-1">
                     {errors.password.message}
                   </p>
                 )}
@@ -119,7 +134,7 @@ const Content = () => {
                     type="checkbox"
                     name="save"
                     id="save"
-                    className="mr-1 w-[14px] h-[14px] appearance-none border-2 border-gray-400 rounded-sm checked:bg-primary-500 transition-all duration-200 cursor-pointer"
+                    className="mr-1 w-[14px] h-[14px] appearance-none border-2 border-gray-400 rounded-sm checked:bg-green-500 transition-all duration-200 cursor-pointer"
                   />
                   <label htmlFor="save">Remember for 30 days</label>
                 </div>
@@ -131,7 +146,7 @@ const Content = () => {
               </div>
 
               <button
-                className="block w-full mt-6 2xl:mt-8 text-white inter py-3 px-6 transition-all hover:bg-primary-300 bg-primary-500"
+                className="cursor-pointer block w-full mt-6 2xl:mt-8 text-white inter py-3 px-6 transition-all hover:bg-green-500/70 bg-green-500"
                 type="submit"
                 disabled={loginMutation.isPending}
               >
@@ -140,7 +155,7 @@ const Content = () => {
 
               <button
                 type="button"
-                className="flex justify-center items-center gap-2 w-full mt-4 2xl:mt-8 text-white inter py-3 px-6 transition-all hover:bg-black-500/70 bg-black"
+                className="cursor-pointer flex justify-center items-center gap-2 w-full mt-4 2xl:mt-8 text-white inter py-3 px-6 transition-all hover:bg-black/70 bg-black"
               >
                 <FaGithub className="text-2xl" /> Sign with GitHub
               </button>
@@ -157,7 +172,7 @@ const Content = () => {
           </div>
         </div>
       </div>
-      <div className="hidden lg:flex justify-center items-center lg:w-1/2 bg-primary-50 ">
+      <div className="hidden lg:flex justify-center items-center lg:w-1/2 bg-green-50 ">
         <Image
           src={images.authPage.loginBanner}
           alt="banner"
