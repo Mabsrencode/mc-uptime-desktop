@@ -1,24 +1,22 @@
 "use client";
+import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
 import images from "@/constants/images";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
-import { FaGithub, FaRegEyeSlash, FaRegEye } from "react-icons/fa";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
-
-const loginSchema = z.object({
+import { FaGithub, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import { z } from "zod";
+const registerSchema = z.object({
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  otp: z.string().min(6, "OTP must be at least 6 characters"),
 });
-
-type LoginFormValues = z.infer<typeof loginSchema>;
-
+type RegisterFormValues = z.infer<typeof registerSchema>;
 const Content = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const router = useRouter();
@@ -26,13 +24,12 @@ const Content = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
   });
-
   const loginMutation = useMutation({
-    mutationFn: async (data: LoginFormValues) => {
-      const response = await fetch("/api/auth/login", {
+    mutationFn: async (data: RegisterFormValues) => {
+      const response = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -45,7 +42,7 @@ const Content = () => {
       return response.json();
     },
     onSuccess: (data) => {
-      toast.success("Login successful!");
+      toast.success("Register successful!");
       router.push("/");
     },
     onError: () => {
@@ -53,12 +50,11 @@ const Content = () => {
     },
   });
 
-  const onSubmit = (values: LoginFormValues) => {
+  const onSubmit = (values: RegisterFormValues) => {
     loginMutation.mutate(values);
   };
-
   return (
-    <section className="min-h-screen flex w-full">
+    <section className="relative min-h-screen h-full flex lg:flex-row-reverse">
       <div className="w-full lg:w-1/2 p-8">
         <h1 className="font-bold text-green-500 tracking-tight text-2xl manrope">
           MC Uptime
@@ -67,11 +63,9 @@ const Content = () => {
           <div className="w-full md:w-7/12">
             <div>
               <h1 className="inter text-2xl 2xl:text-4xl font-semibold">
-                Welcome Back!
+                <span className="text-green-500">Register</span> your FREE
+                account.
               </h1>
-              <p className="mt-2 2xl:mt-4 text-black-500/70">
-                To keep connected with us login with your personal info
-              </p>
             </div>
             <form
               className="w-full mt-6 2xl:mt-12"
@@ -85,9 +79,9 @@ const Content = () => {
                   Email
                 </label>
                 <input
+                  placeholder="johndoe@gmail.com"
                   className="w-full py-3 px-6 border border-borderColor outline-none"
                   type="email"
-                  placeholder="johndoe@gmail.com"
                   {...register("email")}
                 />
                 {errors.email && (
@@ -130,29 +124,12 @@ const Content = () => {
                 )}
               </div>
 
-              <div className="mt-4 text-sm font-medium text-black-500 flex justify-between items-center">
-                <div>
-                  <input
-                    type="checkbox"
-                    name="save"
-                    id="save"
-                    className="mr-1 w-[14px] h-[14px] appearance-none border-2 border-gray-400 rounded-sm checked:bg-green-500 transition-all duration-200 cursor-pointer"
-                  />
-                  <label htmlFor="save">Remember for 30 days</label>
-                </div>
-                <div>
-                  <Link className="underline" href="/auth/forgot-password">
-                    Forgot password
-                  </Link>
-                </div>
-              </div>
-
               <button
-                className="font-semibold cursor-pointer disabled:opacity-70 block w-full mt-6 2xl:mt-8 text-white inter py-3 px-6 transition-all hover:bg-green-500/70 bg-green-500"
+                className="font-semibold disabled:opacity-70 cursor-pointer block w-full mt-6 2xl:mt-8 text-white inter py-3 px-6 transition-all hover:bg-green-500/70 bg-green-500"
                 type="submit"
                 disabled={loginMutation.isPending}
               >
-                {loginMutation.isPending ? <LoaderSpinner /> : "Log In"}
+                {loginMutation.isPending ? <LoaderSpinner /> : "Register now"}
               </button>
 
               <button
@@ -164,12 +141,9 @@ const Content = () => {
 
               <div>
                 <p className="text-right font-semibold mt-4 text-sm text-black-500/70">
-                  Don't have an account?{" "}
-                  <Link
-                    href="/auth/register"
-                    className="underline text-green-500"
-                  >
-                    Register
+                  Already have an account?{" "}
+                  <Link href="/auth/login" className="underline text-green-500">
+                    Login
                   </Link>
                 </p>
               </div>
@@ -179,7 +153,7 @@ const Content = () => {
       </div>
       <div className="hidden lg:flex justify-center items-center lg:w-1/2 bg-green-50 ">
         <Image
-          src={images.authPage.loginBanner}
+          src={images.authPage.registerBanner}
           alt="banner"
           height={500}
           width={500}
