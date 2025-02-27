@@ -75,6 +75,115 @@ export async function POST(
       }
     }
 
+    if (path.includes("register")) {
+      const { email, password } = body;
+      if (!email || !password) {
+        return NextResponse.json(
+          { message: "Missing email or password" },
+          { status: 403 }
+        );
+      }
+
+      try {
+        const response = await fetch(`${environments.API_URL}/auth/register`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Backend error:", errorData);
+          return NextResponse.json(
+            { message: "Backend error", error: errorData },
+            { status: response.status }
+          );
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
+      } catch (error) {
+        console.error("Fetch error:", error);
+        return NextResponse.json(
+          { message: "Server error", error: String(error) },
+          { status: 500 }
+        );
+      }
+    }
+
+    if (path.includes("verify")) {
+      const { email, password, otp } = body;
+      if (!otp) {
+        return NextResponse.json({ message: "Missing OTP" }, { status: 403 });
+      }
+      if (!email || !password) {
+        return NextResponse.json(
+          { message: "Missing email or password" },
+          { status: 403 }
+        );
+      }
+
+      try {
+        const response = await fetch(
+          `${environments.API_URL}/auth/verify-otp`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email, password, otp }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Backend error:", errorData);
+          return NextResponse.json(
+            { message: "Backend error", error: errorData },
+            { status: response.status }
+          );
+        }
+
+        const data = (await response.json()) as { token: string };
+        const decoded = jwt.verify(data.token, environments.JWT) as {
+          userID?: string;
+          password?: string;
+          exp?: number;
+        };
+        const accessToken: string = jwt.sign(
+          { userID: decoded.userID },
+          environments.JWT
+        );
+        const cookieStore = await cookies();
+        if (accessToken && decoded.exp) {
+          cookieStore.set("mc-access-tk", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            expires: new Date(Date.now() + decoded.exp * 1000),
+          });
+        } else {
+          console.error("Decoded token does not contain userID");
+          return NextResponse.json(
+            { message: "Invalid token" },
+            { status: 400 }
+          );
+        }
+        console.log(cookieStore.getAll());
+
+        console.log(decoded);
+        return NextResponse.json(data);
+      } catch (error) {
+        console.error("Fetch error:", error);
+        return NextResponse.json(
+          { message: "Server error", error: String(error) },
+          { status: 500 }
+        );
+      }
+    }
+
     return NextResponse.json({ message: "Invalid path" }, { status: 400 });
   } catch (error) {
     console.error("Server error:", error);
