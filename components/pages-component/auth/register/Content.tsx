@@ -110,7 +110,7 @@ const Content = () => {
 
   return (
     <section className="relative min-h-screen h-full flex lg:flex-row-reverse">
-      <div className="w-full lg:w-1/2 p-8">
+      <div className="w-full lg:w-1/2 p-8 bg-white">
         <h1 className="font-bold text-green-500 tracking-tight text-2xl manrope">
           MC Uptime
         </h1>

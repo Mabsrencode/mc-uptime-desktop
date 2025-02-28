@@ -11,7 +11,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const isPublicRoute = publicRoutes.includes(pathname);
   return (
-    <main className="min-h-screen bg-gray-100">
+    <main className="min-h-screen bg-black/90">
       <Toaster position="bottom-right" reverseOrder={false} />
       <div className={`${!isPublicRoute && "flex"} h-full`}>
         {!isPublicRoute && <SideBar />}

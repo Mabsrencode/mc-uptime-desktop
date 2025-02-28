@@ -39,7 +39,8 @@ const Content = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Invalid credentials");
+        const errorMessage = await response.json();
+        throw new Error(errorMessage.error.message || "Invalid credentials");
       }
 
       return response.json();
@@ -48,8 +49,11 @@ const Content = () => {
       toast.success("Login successful!");
       router.push("/");
     },
-    onError: () => {
-      toast.error("Login failed. Please check your credentials.");
+    onError: (error: { message: string }) => {
+      console.log(error);
+      toast.error(
+        error.message || "Something when wrong from the server. Login failed!"
+      );
     },
   });
 
@@ -59,7 +63,7 @@ const Content = () => {
 
   return (
     <section className="min-h-screen flex w-full">
-      <div className="w-full lg:w-1/2 p-8">
+      <div className="w-full lg:w-1/2 p-8 bg-white">
         <h1 className="font-bold text-green-500 tracking-tight text-2xl manrope">
           MC Uptime
         </h1>
