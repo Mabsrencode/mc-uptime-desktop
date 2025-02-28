@@ -20,6 +20,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 700,
+    minWidth: 1000,
     // fullscreen: true,
     icon: path.join(__dirname, "../public/icon.ico"),
     show: false,
