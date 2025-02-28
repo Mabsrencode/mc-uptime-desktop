@@ -37,51 +37,69 @@ const Content = () => {
 
   const registerMutation = useMutation({
     mutationFn: async (data: RegisterFormValues) => {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Invalid credentials");
+      try {
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          console.log(errorResponse);
+          throw new Error(errorResponse.error.message || "Registration failed");
+        }
+        setShowOTP(true);
+        return response.json();
+      } catch (error) {
+        return error;
       }
-      return response.json();
     },
     onSuccess: (data: { message: string }) => {
-      setShowOTP(true);
-      toast.success(data.message);
+      if (data instanceof Error) {
+        toast.error(data.message);
+      } else {
+        toast.success(data.message);
+      }
     },
-    onError: () => {
+    onError: (error) => {
       toast.error("Registration failed. Please check your credentials.");
     },
   });
 
   const verifyMutation = useMutation({
     mutationFn: async (data: RegisterFormValues) => {
-      const response = await fetch("/api/auth/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await fetch("/api/auth/verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
-      if (!response.ok) {
-        throw new Error("Invalid credentials");
+        if (!response.ok) {
+          const errorResponse = await response.json();
+          throw new Error(errorResponse.error.message || "Verification failed");
+        }
+        return response.json();
+      } catch (error) {
+        return error;
       }
-      return response.json();
     },
     onSuccess: (data) => {
-      toast.success("Registration successful!");
-      router.push("/");
+      console.log(data);
+      if (data instanceof Error) {
+        toast.error(data.message);
+      } else {
+        toast.success(data.message);
+        router.push("/");
+      }
     },
     onError: () => {
-      toast.error("OTP verification failed. Please check your OTP.");
+      toast.error("Verification failed. Please check your OTP.");
     },
   });
 
   const onSubmit = (values: RegisterFormValues) => {
     const formData = { ...values, otp };
-    console.log(formData);
     if (!showOTP) {
       delete values.otp;
     }

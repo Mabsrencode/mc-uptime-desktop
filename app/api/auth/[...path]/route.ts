@@ -62,9 +62,6 @@ export async function POST(
             { status: 400 }
           );
         }
-        console.log(cookieStore.getAll());
-
-        console.log(decoded);
         return NextResponse.json(data);
       } catch (error) {
         console.error("Fetch error:", error);
@@ -116,7 +113,10 @@ export async function POST(
     if (path.includes("verify")) {
       const { email, password, otp } = body;
       if (!otp) {
-        return NextResponse.json({ message: "Missing OTP" }, { status: 403 });
+        return NextResponse.json(
+          { error: { message: "Missing OTP" } },
+          { status: 403 }
+        );
       }
       if (!email || !password) {
         return NextResponse.json(
@@ -171,10 +171,7 @@ export async function POST(
             { status: 400 }
           );
         }
-        console.log(cookieStore.getAll());
-
-        console.log(decoded);
-        return NextResponse.json(data);
+        return NextResponse.json({ message: "Registered Successfully!" });
       } catch (error) {
         console.error("Fetch error:", error);
         return NextResponse.json(

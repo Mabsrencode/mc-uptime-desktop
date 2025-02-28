@@ -5,7 +5,7 @@ let mainWindow;
 let splashScreen;
 
 const createWindow = async () => {
-  Menu.setApplicationMenu(null);
+  // Menu.setApplicationMenu(false);
 
   splashScreen = new BrowserWindow({
     width: 400,
