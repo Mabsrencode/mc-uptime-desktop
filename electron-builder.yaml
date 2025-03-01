@@ -1,6 +1,6 @@
-appId: "io.github.rbfraphael.electron-next"
-productName: "Electron Next.JS"
-copyright: "Copyright (c) 2023 RBFraphael"
+appId: "https://github.com/Mabsrencode/mc-uptime-desktop"
+productName: "MC Uptimeme and a"
+copyright: "Copyright (c) 2025 MC Uptime"
 win:
   target: ["dir", "portable", "zip"]
   icon: "public/icon.ico"
