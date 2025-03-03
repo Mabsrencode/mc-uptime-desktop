@@ -61,7 +61,11 @@ const Content = () => {
         toast.success(data.message);
       }
     },
+<<<<<<< HEAD
     onError: (error) => {
+=======
+    onError: () => {
+>>>>>>> 2da12e0 (Fresh Start)
       toast.error("Registration failed. Please check your credentials.");
     },
   });
@@ -103,9 +107,18 @@ const Content = () => {
     if (!showOTP) {
       delete values.otp;
     }
+<<<<<<< HEAD
     showOTP
       ? verifyMutation.mutate(formData)
       : registerMutation.mutate(formData);
+=======
+
+    if (showOTP) {
+      verifyMutation.mutate(formData);
+    } else {
+      registerMutation.mutate(formData);
+    }
+>>>>>>> 2da12e0 (Fresh Start)
   };
 
   return (

@@ -37,8 +37,10 @@ export async function POST(
           );
         }
 
-        const data = (await response.json()) as { token: string };
-        const decoded = jwt.verify(data.token, environments.JWT) as {
+        const data = (await response.json()) as {
+          user: { email: string; token: string };
+        };
+        const decoded = jwt.verify(data.user.token, environments.JWT) as {
           userID?: string;
           password?: string;
           exp?: number;
@@ -146,8 +148,10 @@ export async function POST(
           );
         }
 
-        const data = (await response.json()) as { token: string };
-        const decoded = jwt.verify(data.token, environments.JWT) as {
+        const data = (await response.json()) as {
+          user: { email: string; token: string };
+        };
+        const decoded = jwt.verify(data.user.token, environments.JWT) as {
           userID?: string;
           password?: string;
           exp?: number;
@@ -171,7 +175,10 @@ export async function POST(
             { status: 400 }
           );
         }
-        return NextResponse.json({ message: "Registered Successfully!" });
+        return NextResponse.json({
+          user: data,
+          message: "Registered Successfully!",
+        });
       } catch (error) {
         console.error("Fetch error:", error);
         return NextResponse.json(

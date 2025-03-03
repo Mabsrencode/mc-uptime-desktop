@@ -45,7 +45,11 @@ const Content = () => {
 
       return response.json();
     },
+<<<<<<< HEAD
     onSuccess: (data) => {
+=======
+    onSuccess: () => {
+>>>>>>> 2da12e0 (Fresh Start)
       toast.success("Login successful!");
       router.push("/");
     },
@@ -168,7 +172,11 @@ const Content = () => {
 
               <div>
                 <p className="text-right font-semibold mt-4 text-sm text-black-500/70">
+<<<<<<< HEAD
                   Don't have an account?{" "}
+=======
+                  Don&apos;t have an account?{" "}
+>>>>>>> 2da12e0 (Fresh Start)
                   <Link
                     href="/auth/register"
                     className="underline text-green-500"
