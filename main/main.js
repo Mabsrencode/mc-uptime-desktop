@@ -21,10 +21,7 @@ const createWindow = async () => {
     width: 1200,
     height: 700,
     minWidth: 1000,
-<<<<<<< HEAD
-=======
     minHeight: 500,
->>>>>>> 2da12e0 (Fresh Start)
     // fullscreen: true,
     icon: path.join(__dirname, "../public/icon.ico"),
     show: false,

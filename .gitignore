@@ -19,10 +19,7 @@
 
 # production
 /build
-<<<<<<< HEAD
-=======
 /dist
->>>>>>> 2da12e0 (Fresh Start)
 
 # misc
 .DS_Store

@@ -28,16 +28,13 @@ const navigationItems = [
 ];
 
 const SideBar = () => {
-  const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>();
+  const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
+
   const pathname = usePathname();
   return (
     <aside
       className={`sticky top-0 py-6 bg-black/40 transition-all  text-white h-screen flex flex-col justify-between items-center ${
-<<<<<<< HEAD
-        isSideBarOpen ? "w-[200px]" : "w-[60px]"
-=======
         isSideBarOpen ? "w-[150px]" : "w-[60px]"
->>>>>>> 2da12e0 (Fresh Start)
       }`}
     >
       <div className="flex flex-col items-center">
@@ -67,11 +64,7 @@ const SideBar = () => {
                 >
                   {navItem.icon}
                   <span
-<<<<<<< HEAD
-                    className={`text-sm text-nowrap ${
-=======
                     className={`text-sm text-nowrap text-white ${
->>>>>>> 2da12e0 (Fresh Start)
                       isSideBarOpen ? "block" : "hidden"
                     }`}
                   >

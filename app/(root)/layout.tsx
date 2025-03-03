@@ -7,11 +7,7 @@ import { Toaster } from "react-hot-toast";
 const queryClient = new QueryClient();
 
 const publicRoutes = ["/auth/login", "/auth/register"];
-<<<<<<< HEAD
-const layout = ({ children }: { children: React.ReactNode }) => {
-=======
 const Layout = ({ children }: { children: React.ReactNode }) => {
->>>>>>> 2da12e0 (Fresh Start)
   const pathname = usePathname();
   const isPublicRoute = publicRoutes.includes(pathname);
   return (
@@ -27,8 +23,4 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-<<<<<<< HEAD
-export default layout;
-=======
 export default Layout;
->>>>>>> 2da12e0 (Fresh Start)
