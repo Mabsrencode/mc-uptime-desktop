@@ -64,7 +64,10 @@ export async function POST(
             { status: 400 }
           );
         }
-        return NextResponse.json(data);
+        return NextResponse.json({
+          data,
+          message: "Login Successfully!",
+        });
       } catch (error) {
         console.error("Fetch error:", error);
         return NextResponse.json(
@@ -176,7 +179,7 @@ export async function POST(
           );
         }
         return NextResponse.json({
-          user: data,
+          data,
           message: "Registered Successfully!",
         });
       } catch (error) {
