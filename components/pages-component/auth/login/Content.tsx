@@ -48,10 +48,11 @@ const Content = () => {
     },
     onSuccess: (data) => {
       console.log(data);
-      if (data)
+      if (data) {
         useAuthStore.setState({
           data: { user: { email: data.data.user.email } },
         });
+      }
       toast.success("Login successful!");
       router.push("/");
     },

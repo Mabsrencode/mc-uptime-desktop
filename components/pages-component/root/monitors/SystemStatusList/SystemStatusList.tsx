@@ -4,9 +4,11 @@ import "./style.css";
 import { MdArrowDropDownCircle } from "react-icons/md";
 import React, { useState } from "react";
 import { GoPlus } from "react-icons/go";
+import { FiRefreshCw } from "react-icons/fi";
 import Divider from "@/components/reusable/Divider/Divider";
 import { IoIosClose } from "react-icons/io";
 import Image from "next/image";
+import { useAuthStore } from "@/stores/useAuthStore";
 const monitorTypes = [
   {
     label: "HTTP / website monitoring",
@@ -39,6 +41,10 @@ const monitorTypes = [
 ];
 
 const SystemStatusList = () => {
+  const { data } = useAuthStore();
+  const [value, setValue] = useState(5);
+  const options = [0.5, 1, 5, 30, 60, 720, 1440];
+  const labels = ["30s", "1m", "5m", "30m", "1h", "12h", "24h"];
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedMonitor, setSelectedMonitor] = useState(monitorTypes[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -57,7 +63,7 @@ const SystemStatusList = () => {
             style={{
               backgroundColor: "#00170c",
             }}
-            className="relative w-[70%] z-[1000] h-[90%] rounded-lg px-8 py-6 text-white border border-white/10"
+            className="relative w-[70%] z-[1000] rounded-lg px-8 py-6 text-white border border-white/10"
           >
             <IoIosClose
               onClick={() => setShowFormModal(false)}
@@ -152,8 +158,8 @@ const SystemStatusList = () => {
               <Divider />
               <div>
                 <h2 className="font-bold text-sm">How we will notify you?</h2>
-                <div className="flex gap-12 flex-wrap mt-2">
-                  <div className="flex-1 w-full ">
+                <div className="flex gap-6 flex-wrap mt-2">
+                  <div className="flex-1 w-full bg-green-950/50 p-2 rounded-lg">
                     <div className="flex items-center gap-2">
                       <input type="checkbox" id="email" />
                       <label htmlFor="email" className="text-sm inter">
@@ -161,20 +167,85 @@ const SystemStatusList = () => {
                       </label>
                     </div>
                     <p className="text-white/50 text-xs mt-1 overflow-hidden text-ellipsis">
-                      rdmababa3646pam@student.fatima.edu.ph
+                      {data && data.user?.email}
                     </p>
-                    <div></div>
+                    <div className="flex gap-2 items-center mt-1">
+                      <FiRefreshCw className="bg-[#000d07] shadow p-2 rounded-md text-3xl" />{" "}
+                      <p className="text-white/50 text-xs">
+                        No delay, no repeat
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 w-full ">
+                  <div className="flex-1 w-full  bg-green-950/50 p-2 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <input type="checkbox" id="sms" />
-                      <label htmlFor="sms" className="text-sm inter">
+                      <input
+                        type="checkbox"
+                        disabled={data?.user?.number ? false : true}
+                        id="sms"
+                      />
+                      <label
+                        htmlFor="sms"
+                        className={`text-sm inter ${
+                          data?.user?.number ? "text-white" : "text-gray-400"
+                        }`}
+                      >
                         SMS message
                       </label>
+                    </div>
+                    <p className="text-white/50 text-xs mt-1 overflow-hidden text-ellipsis">
+                      {data && data.user?.number ? (
+                        data.user.number
+                      ) : (
+                        <button className="text-green-500 underline text-xs">
+                          Add phone number
+                        </button>
+                      )}
+                    </p>
+                    <div className="flex gap-2 items-center mt-1">
+                      <FiRefreshCw className="bg-[#000d07] shadow p-2 rounded-md text-3xl" />{" "}
+                      <p className="text-white/50 text-xs">
+                        No delay, no repeat
+                      </p>
                     </div>
                   </div>
                 </div>
               </div>
+              <Divider />
+              <div className="">
+                <h3 className="text-sm font-bold">Monitor interval</h3>
+                <p className="text-sm text-gray-400 mt-1">
+                  Your monitor will be checked every{" "}
+                  <span className="font-semibold text-white">
+                    {value} minutes
+                  </span>
+                  . We recommend at least 1-minute checks.
+                </p>
+                <div className="mt-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max={options.length - 1}
+                    value={options.indexOf(value)}
+                    onChange={(e) => setValue(options[Number(e.target.value)])}
+                    className="w-full cursor-pointer accent-green-500"
+                  />
+                </div>
+                <div className="flex justify-between text-gray-400 text-xs mt-2">
+                  {labels.map((label, index) => (
+                    <span
+                      key={index}
+                      className={
+                        value === options[index] ? "text-white font-bold" : ""
+                      }
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <button className="text-sm px-12 py-3 bg-green-700 hover:bg-green-700/70 mt-6 rounded-lg cursor-pointer">
+                Create Monitor
+              </button>
             </div>
           </form>
         </div>
