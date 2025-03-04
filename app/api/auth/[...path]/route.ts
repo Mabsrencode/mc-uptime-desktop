@@ -47,7 +47,8 @@ export async function POST(
         };
         const accessToken: string = jwt.sign(
           { userID: decoded.userID },
-          environments.JWT
+          environments.JWT,
+          { expiresIn: "1h" }
         );
         const cookieStore = await cookies();
         if (accessToken && decoded.exp) {
@@ -55,7 +56,7 @@ export async function POST(
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             path: "/",
-            expires: new Date(Date.now() + decoded.exp * 1000),
+            expires: new Date(decoded.exp * 1000), //Date.now() +
           });
         } else {
           console.error("Decoded token does not contain userID");
@@ -161,7 +162,8 @@ export async function POST(
         };
         const accessToken: string = jwt.sign(
           { userID: decoded.userID },
-          environments.JWT
+          environments.JWT,
+          { expiresIn: "1h" }
         );
         const cookieStore = await cookies();
         if (accessToken && decoded.exp) {
@@ -169,7 +171,7 @@ export async function POST(
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             path: "/",
-            expires: new Date(Date.now() + decoded.exp * 1000),
+            expires: new Date(decoded.exp * 1000),
           });
         } else {
           console.error("Decoded token does not contain userID");

@@ -6,6 +6,8 @@ interface AuthState {
   logout: () => void;
 }
 
+const isClient = typeof window !== "undefined";
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -16,14 +18,17 @@ export const useAuthStore = create<AuthState>()(
       name: "auth-storage",
       storage: {
         getItem: (name) => {
-          const item = sessionStorage.getItem(name);
+          if (!isClient) return null;
+          const item = localStorage.getItem(name);
           return item ? JSON.parse(item) : null;
         },
         setItem: (name, value) => {
-          sessionStorage.setItem(name, JSON.stringify(value));
+          if (!isClient) return;
+          localStorage.setItem(name, JSON.stringify(value));
         },
         removeItem: (name) => {
-          sessionStorage.removeItem(name);
+          if (!isClient) return;
+          localStorage.removeItem(name);
         },
       },
     }

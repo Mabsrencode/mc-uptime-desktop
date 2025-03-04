@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email format"),
@@ -45,7 +46,12 @@ const Content = () => {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data);
+      if (data)
+        useAuthStore.setState({
+          data: { user: { email: data.data.user.email } },
+        });
       toast.success("Login successful!");
       router.push("/");
     },
