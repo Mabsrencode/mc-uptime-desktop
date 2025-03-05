@@ -50,7 +50,12 @@ const Content = () => {
       console.log(data);
       if (data) {
         useAuthStore.setState({
-          data: { user: { email: data.data.user.email } },
+          data: {
+            user: {
+              email: data.data.user.email,
+              userID: data.data.user.userID,
+            },
+          },
         });
       }
       toast.success("Login successful!");

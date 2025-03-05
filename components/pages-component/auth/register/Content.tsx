@@ -1,6 +1,7 @@
 "use client";
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
 import images from "@/constants/images";
+import { useAuthStore } from "@/stores/useAuthStore";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
@@ -90,6 +91,14 @@ const Content = () => {
         toast.error(data.message);
       } else {
         toast.success(data.message);
+        useAuthStore.setState({
+          data: {
+            user: {
+              email: data.data.user.email,
+              userID: data.data.user.userID,
+            },
+          },
+        });
         router.push("/");
       }
     },

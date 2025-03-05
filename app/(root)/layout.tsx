@@ -11,7 +11,6 @@ const publicRoutes = ["/auth/login", "/auth/register"];
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const { data } = useAuthStore();
-
   useEffect(() => {
     if (!data?.user) {
       router.push("/auth/login");

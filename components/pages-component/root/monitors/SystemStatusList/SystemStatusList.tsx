@@ -11,6 +11,8 @@ import Image from "next/image";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { z } from "zod";
 import { useForm, Resolver, SubmitHandler } from "react-hook-form";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 const monitorTypes = [
   {
     label: "HTTP / website monitoring",
@@ -63,7 +65,41 @@ const SystemStatusList = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>();
-  const onSubmit: SubmitHandler<FormValues> = (data) => console.log(data);
+
+  const handleAddURL = useMutation({
+    mutationFn: async (values: FormValues) => {
+      const response = await fetch("/api/monitor", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          url: values.url,
+          userID: data?.user?.userID,
+          email: values.notifyBy_email,
+        }),
+      });
+      if (!response.ok) {
+        const errorMessage = await response.json();
+        throw new Error(errorMessage.error.message);
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success("Adding URL successful!");
+    },
+    onError: (error: { message: string }) => {
+      console.log(error);
+      toast.error(
+        error.message ||
+          "Something when wrong from the server. Adding URL failed!"
+      );
+    },
+  });
+
+  const onSubmit = (data: FormValues) => {
+    handleAddURL.mutate(data);
+  };
 
   return (
     <>
