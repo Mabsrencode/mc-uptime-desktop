@@ -9,6 +9,8 @@ import Divider from "@/components/reusable/Divider/Divider";
 import { IoIosClose } from "react-icons/io";
 import Image from "next/image";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { z } from "zod";
+import { useForm, Resolver, SubmitHandler } from "react-hook-form";
 const monitorTypes = [
   {
     label: "HTTP / website monitoring",
@@ -40,6 +42,14 @@ const monitorTypes = [
   },
 ];
 
+const urlSchema = z.object({
+  url: z.string(),
+  notifyBy_email: z.boolean(),
+  notifyBy_number: z.boolean(),
+});
+
+type FormValues = z.infer<typeof urlSchema>;
+
 const SystemStatusList = () => {
   const { data } = useAuthStore();
   const [value, setValue] = useState(5);
@@ -48,6 +58,12 @@ const SystemStatusList = () => {
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedMonitor, setSelectedMonitor] = useState(monitorTypes[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>();
+  const onSubmit: SubmitHandler<FormValues> = (data) => console.log(data);
 
   return (
     <>
@@ -60,6 +76,7 @@ const SystemStatusList = () => {
           ></div>
 
           <form
+            onSubmit={handleSubmit(onSubmit)}
             style={{
               backgroundColor: "#00170c",
             }}
@@ -150,10 +167,21 @@ const SystemStatusList = () => {
                   URL to monitor
                 </label>
                 <input
+                  {...register("url", {
+                    required: {
+                      value: true,
+                      message: "Please enter the URL to monitor",
+                    },
+                  })}
                   type="text"
                   placeholder="https://"
                   className="mt-1 transition-all outline-none border border-white/10 hover:border-white/50 bg-[#000d07] rounded-lg py-2 px-4 placeholder:text-white placeholder:text-sm inter text-sm"
                 />
+                {errors.url && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.url.message}
+                  </p>
+                )}
               </div>
               <Divider />
               <div>
@@ -161,7 +189,17 @@ const SystemStatusList = () => {
                 <div className="flex gap-6 flex-wrap mt-2">
                   <div className="flex-1 w-full bg-green-950/50 p-2 rounded-lg">
                     <div className="flex items-center gap-2">
-                      <input type="checkbox" id="email" />
+                      <input
+                        type="checkbox"
+                        id="email"
+                        {...register("notifyBy_email", {
+                          required: {
+                            value: data?.user?.email ? true : false,
+                            message: "Email is required",
+                          },
+                        })}
+                        checked={data?.user?.email ? true : false}
+                      />
                       <label htmlFor="email" className="text-sm inter">
                         E-mail
                       </label>
@@ -175,10 +213,16 @@ const SystemStatusList = () => {
                         No delay, no repeat
                       </p>
                     </div>
+                    {errors.notifyBy_email && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.notifyBy_email.message}
+                      </p>
+                    )}
                   </div>
                   <div className="flex-1 w-full  bg-green-950/50 p-2 rounded-lg">
                     <div className="flex items-center gap-2">
                       <input
+                        {...register("notifyBy_number")}
                         type="checkbox"
                         disabled={data?.user?.number ? false : true}
                         id="sms"
@@ -207,6 +251,11 @@ const SystemStatusList = () => {
                         No delay, no repeat
                       </p>
                     </div>
+                    {errors.notifyBy_number && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.notifyBy_number.message}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -243,7 +292,10 @@ const SystemStatusList = () => {
                   ))}
                 </div>
               </div>
-              <button className="text-sm px-12 py-3 bg-green-700 hover:bg-green-700/70 mt-6 rounded-lg cursor-pointer">
+              <button
+                type="submit"
+                className="text-sm px-12 py-3 bg-green-700 hover:bg-green-700/70 mt-6 rounded-lg cursor-pointer"
+              >
                 Create Monitor
               </button>
             </div>
