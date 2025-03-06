@@ -63,6 +63,7 @@ const SystemStatusList = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<FormValues>();
 
@@ -74,7 +75,7 @@ const SystemStatusList = () => {
         body: JSON.stringify({
           url: values.url,
           userID: data?.user?.userID,
-          email: values.notifyBy_email,
+          email: data?.user?.email,
         }),
       });
       if (!response.ok) {
@@ -87,6 +88,8 @@ const SystemStatusList = () => {
     onSuccess: (data) => {
       console.log(data);
       toast.success("Adding URL successful!");
+      setShowFormModal(false);
+      reset();
     },
     onError: (error: { message: string }) => {
       console.log(error);

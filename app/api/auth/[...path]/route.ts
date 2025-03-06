@@ -46,7 +46,7 @@ export async function POST(
           exp?: number;
         };
         const accessToken: string = jwt.sign(
-          { userID: decoded.userID },
+          { userID: decoded.userID, password: decoded.password },
           environments.JWT,
           { expiresIn: "1h" }
         );
@@ -161,7 +161,7 @@ export async function POST(
           exp?: number;
         };
         const accessToken: string = jwt.sign(
-          { userID: decoded.userID },
+          { userID: decoded.userID, password: decoded.password },
           environments.JWT,
           { expiresIn: "1h" }
         );
