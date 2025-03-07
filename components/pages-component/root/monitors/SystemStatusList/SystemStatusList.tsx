@@ -76,6 +76,8 @@ const SystemStatusList = () => {
           url: values.url,
           userID: data?.user?.userID,
           email: data?.user?.email,
+          interval: value,
+          monitorType: selectedMonitor.value,
         }),
       });
       if (!response.ok) {

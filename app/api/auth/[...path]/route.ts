@@ -192,6 +192,15 @@ export async function POST(
         );
       }
     }
+    if (path.includes("logout")) {
+      try {
+        const cookieStore = await cookies();
+        cookieStore.delete("mc-access-tk");
+        return NextResponse.json({ message: "Logout successfully!" });
+      } catch (error) {
+        NextResponse.json({ error: error });
+      }
+    }
 
     return NextResponse.json({ message: "Invalid path" }, { status: 400 });
   } catch (error) {

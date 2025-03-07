@@ -8,8 +8,8 @@ const createWindow = async () => {
   // Menu.setApplicationMenu(false);
 
   splashScreen = new BrowserWindow({
-    width: 400,
-    height: 300,
+    width: 300,
+    height: 400,
     frame: false,
     alwaysOnTop: true,
     transparent: true,

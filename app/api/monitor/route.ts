@@ -7,14 +7,20 @@ export async function POST(req: Request) {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("mc-access-tk")?.value;
     const body = await req.json();
-    const { url, userID, email } = body;
+    const { url, userID, email, interval, monitorType } = body;
     const response = await fetch(`${environments.API_URL}/site`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ url, userID, email }),
+      body: JSON.stringify({
+        url,
+        userID,
+        email,
+        interval,
+        monitorType,
+      }),
     });
     if (!response.ok) {
       const errorData = await response.json();

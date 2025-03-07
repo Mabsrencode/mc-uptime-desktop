@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { MdOutlineMonitor, MdError } from "react-icons/md";
 import { HiOutlineStatusOnline } from "react-icons/hi";
+import { useAuthStore } from "@/stores/useAuthStore";
 import {
   TbLayoutSidebarLeftExpandFilled,
   TbLayoutSidebarRightExpandFilled,
@@ -29,7 +30,7 @@ const navigationItems = [
 
 const SideBar = () => {
   const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
-
+  const { data } = useAuthStore();
   const pathname = usePathname();
   return (
     <aside
@@ -77,16 +78,24 @@ const SideBar = () => {
         </nav>
       </div>
       <div>
-        <div></div>
-        <div>
+        <div className="w-full">
+          {data && data.user?.email ? (
+            <div className="flex justify-center items-center bg-green-500 text-3xl rounded-full h-11 w-11">
+              <h3> {data.user.email.split("")[0].toUpperCase()}</h3>
+            </div>
+          ) : (
+            <div className="rounded-full h-11 w-11 bg-gray-400 animate-pulse"></div>
+          )}
+        </div>
+        <div className="mt-12">
           {!isSideBarOpen ? (
             <TbLayoutSidebarLeftExpandFilled
-              className="cursor-pointer text-2xl"
+              className="cursor-pointer text-2xl mx-auto"
               onClick={() => setIsSideBarOpen(!isSideBarOpen)}
             />
           ) : (
             <TbLayoutSidebarRightExpandFilled
-              className="cursor-pointer text-2xl"
+              className="cursor-pointer text-2xl mx-auto"
               onClick={() => setIsSideBarOpen(!isSideBarOpen)}
             />
           )}
