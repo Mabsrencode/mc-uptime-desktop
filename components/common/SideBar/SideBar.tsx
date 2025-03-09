@@ -68,7 +68,7 @@ const SideBar = () => {
           )}
         </Link>
         <nav className="mt-12">
-          <ul className="grid gap-2 text-xl transition-all">
+          <ul className="grid gap-2 px-2 text-xl transition-all">
             {navigationItems.map((navItem) => (
               <li key={navItem.link}>
                 <Link
@@ -100,7 +100,7 @@ const SideBar = () => {
             <div className="relative">
               <div
                 onClick={() => setOpenProfileContainer(!openProfileContainer)}
-                className="flex justify-center items-center bg-green-500 text-3xl rounded-full h-11 w-11 hover:bg-green-600 cursor-pointer transition-all border border-amber-50/50"
+                className="flex justify-center items-center bg-green-700 text-3xl rounded-full h-11 w-11 hover:bg-green-600 cursor-pointer transition-all"
               >
                 <h3> {data.user.email.split("")[0].toUpperCase()}</h3>
               </div>

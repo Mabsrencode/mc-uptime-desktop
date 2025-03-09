@@ -19,7 +19,7 @@ const monitorTypes = [
     label: "HTTP / website monitoring",
     description:
       "Use HTTP(S) monitor to monitor your website, API endpoint, or anything running on HTTP.",
-    value: "website",
+    value: "HTTP",
     image: icons.http,
   },
   {

@@ -22,7 +22,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <main className="min-h-screen bg-black/90">
       <Toaster position="bottom-right" reverseOrder={false} />
       <div className={`${!isPublicRoute && "flex"} h-full`}>
-        {!isPublicRoute && data?.user && <SideBar />}
+        {!isPublicRoute && data && data.user && <SideBar />}
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>
