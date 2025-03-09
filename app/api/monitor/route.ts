@@ -43,7 +43,6 @@ export async function GET(req: Request) {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("mc-access-tk")?.value;
-    console.log(accessToken);
 
     if (!accessToken) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -69,6 +68,7 @@ export async function GET(req: Request) {
         },
       }
     );
+    const data = await response.json();
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -78,7 +78,7 @@ export async function GET(req: Request) {
         { status: response.status }
       );
     }
-    return NextResponse.json(response);
+    return NextResponse.json(data);
   } catch (error) {
     console.error("Fetch error:", error);
     return NextResponse.json(

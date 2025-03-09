@@ -13,6 +13,7 @@ import { z } from "zod";
 import { useForm, Resolver, SubmitHandler } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import SystemStatusListTable from "../SystemStatusListTable/SystemStatusListTable";
 const monitorTypes = [
   {
     label: "HTTP / website monitoring",
@@ -55,8 +56,8 @@ type FormValues = z.infer<typeof urlSchema>;
 const SystemStatusList = () => {
   const { data } = useAuthStore();
   const [value, setValue] = useState(5);
-  const options = [0.5, 1, 5, 30, 60, 720, 1440];
-  const labels = ["30s", "1m", "5m", "30m", "1h", "12h", "24h"];
+  const options = [1, 5, 30, 60, 720, 1440];
+  const labels = ["1m", "5m", "30m", "1h", "12h", "24h"];
   const [showFormModal, setShowFormModal] = useState(false);
   const [selectedMonitor, setSelectedMonitor] = useState(monitorTypes[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -358,6 +359,7 @@ const SystemStatusList = () => {
             </button>
           </div>
         </div>
+        <SystemStatusListTable />
       </section>
     </>
   );

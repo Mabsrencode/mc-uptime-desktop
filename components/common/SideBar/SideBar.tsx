@@ -8,8 +8,10 @@ import {
   TbLayoutSidebarLeftExpandFilled,
   TbLayoutSidebarRightExpandFilled,
 } from "react-icons/tb";
+import { IoIosClose } from "react-icons/io";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 const navigationItems = [
   {
     link: "/monitors",
@@ -29,9 +31,24 @@ const navigationItems = [
 ];
 
 const SideBar = () => {
-  const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
-  const { data } = useAuthStore();
+  const { data, logout } = useAuthStore();
   const pathname = usePathname();
+  const router = useRouter();
+  const [isSideBarOpen, setIsSideBarOpen] = useState<boolean>(false);
+  const [openProfileContainer, setOpenProfileContainer] =
+    useState<boolean>(false);
+  const handleLogOut = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", { method: "POST" });
+      const data = await response.json();
+      toast.success(data.message);
+      logout();
+      router.push("/auth/login");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <aside
       className={`sticky top-0 py-6 bg-black/40 transition-all  text-white h-screen flex flex-col justify-between items-center ${
@@ -78,15 +95,67 @@ const SideBar = () => {
         </nav>
       </div>
       <div>
-        <div className="w-full">
+        <div className="relative w-full">
           {data && data.user?.email ? (
-            <div className="flex justify-center items-center bg-green-500 text-3xl rounded-full h-11 w-11">
-              <h3> {data.user.email.split("")[0].toUpperCase()}</h3>
+            <div className="relative">
+              <div
+                onClick={() => setOpenProfileContainer(!openProfileContainer)}
+                className="flex justify-center items-center bg-green-500 text-3xl rounded-full h-11 w-11 hover:bg-green-600 cursor-pointer transition-all border border-amber-50/50"
+              >
+                <h3> {data.user.email.split("")[0].toUpperCase()}</h3>
+              </div>
             </div>
           ) : (
             <div className="rounded-full h-11 w-11 bg-gray-400 animate-pulse"></div>
           )}
         </div>
+        {openProfileContainer && data && data.user?.email && (
+          <div className="absolute bg-white rounded-lg bottom-6 left-14 w-[300px]">
+            <div className="relative p-3">
+              <h3 className="text-sm text-black w-[230px] font-bold text-ellipsis overflow-hidden">
+                {data.user.email}
+              </h3>
+              <IoIosClose
+                onClick={() => setOpenProfileContainer(false)}
+                className="absolute top-1 right-1 text-black text-3xl hover:bg-slate-600/20 rounded-full cursor-pointer"
+              />
+              <ul className="text-black text-base my-2">
+                <li>
+                  <Link
+                    className="py-1 hover:font-bold block border-t"
+                    href={"account-details"}
+                  >
+                    Account Details
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="py-1 hover:font-bold block border-t"
+                    href={"notifications"}
+                  >
+                    Notifications & reports
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    className="py-1 hover:font-bold block border-t border-b"
+                    href={"security"}
+                  >
+                    Security
+                  </Link>
+                </li>
+              </ul>
+              <div className="w-full mt-4">
+                <button
+                  onClick={handleLogOut}
+                  className="text-sm mx-auto block px-12 py-2 bg-green-700 hover:bg-green-700/70 rounded cursor-pointer"
+                >
+                  Log out
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mt-12">
           {!isSideBarOpen ? (
             <TbLayoutSidebarLeftExpandFilled

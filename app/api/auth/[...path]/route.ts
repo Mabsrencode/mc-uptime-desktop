@@ -8,9 +8,9 @@ export async function POST(
 ) {
   try {
     const { path } = await params;
-    const body = await req.json();
 
     if (path.includes("login")) {
+      const body = await req.json();
       const { email, password } = body;
       if (!email || !password) {
         return NextResponse.json(
@@ -79,6 +79,7 @@ export async function POST(
     }
 
     if (path.includes("register")) {
+      const body = await req.json();
       const { email, password } = body;
       if (!email || !password) {
         return NextResponse.json(
@@ -117,6 +118,7 @@ export async function POST(
     }
 
     if (path.includes("verify")) {
+      const body = await req.json();
       const { email, password, otp } = body;
       if (!otp) {
         return NextResponse.json(
@@ -198,7 +200,11 @@ export async function POST(
         cookieStore.delete("mc-access-tk");
         return NextResponse.json({ message: "Logout successfully!" });
       } catch (error) {
-        NextResponse.json({ error: error });
+        console.error("Logout error:", error);
+        return NextResponse.json(
+          { message: "Logout failed", error: String(error) },
+          { status: 500 }
+        );
       }
     }
 
