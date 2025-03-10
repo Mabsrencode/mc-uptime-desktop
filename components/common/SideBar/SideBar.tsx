@@ -51,7 +51,7 @@ const SideBar = () => {
 
   return (
     <aside
-      className={`sticky top-0 py-6 bg-black/40 transition-all  text-white h-screen flex flex-col justify-between items-center ${
+      className={`sticky z-[1000] top-0 py-6 bg-black/40 transition-all  text-white h-screen flex flex-col justify-between items-center ${
         isSideBarOpen ? "w-[150px]" : "w-[60px]"
       }`}
     >

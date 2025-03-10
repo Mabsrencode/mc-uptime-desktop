@@ -62,13 +62,28 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     retry: false,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="flex flex-col gap-2 mt-6">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={index}
+            className="h-[60px] w-full bg-gray-400 animate-pulse rounded border border-white/20 p-4"
+          >
+            <div className="flex flex-col gap-2">
+              <div className="w-[40%] h-[12px] bg-gray-500 rounded-full"></div>
+              <div className="w-[20%] h-[12px] bg-gray-500 rounded-full"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
   if (error) return <div>Error loading data.</div>;
 
   return (
     <div className="text-white w-full mt-6">
       {data && data.length === 0 ? (
-        <div className="relative w-full mt-24 overflow-hidden">
+        <div className="relative w-full mt-24 overflow-hidden z-10">
           <div className="relative ">
             <div className="w-7/12">
               <h1 className="text-white manrope font-bold text-6xl">
@@ -76,9 +91,13 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                 a click<span className="text-green-500">.</span>
               </h1>
               <p className="text-lg mt-6 inter">
-                Keep an eye on your website, API, email service, or any port or
-                device on the network. Ping our servers to track cron jobs and
-                stay on top of critical incidents.
+                Keep an eye on your{" "}
+                <span className="text-green-500">
+                  website, API, email service, or any port or device on the
+                  network
+                </span>
+                . Ping our servers to track cron jobs and stay on top of
+                critical incidents.
               </p>
             </div>
             <div className="mt-12">
