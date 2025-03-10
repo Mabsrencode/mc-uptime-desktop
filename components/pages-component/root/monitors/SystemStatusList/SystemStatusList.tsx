@@ -11,7 +11,7 @@ import Image from "next/image";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import SystemStatusListTable from "../SystemStatusListTable/SystemStatusListTable";
 const monitorTypes = [
@@ -67,6 +67,7 @@ const SystemStatusList = () => {
     reset,
     formState: { errors },
   } = useForm<FormValues>();
+  const queryClient = useQueryClient();
 
   const handleAddURL = useMutation({
     mutationFn: async (values: FormValues) => {
@@ -93,6 +94,7 @@ const SystemStatusList = () => {
       toast.success("Adding URL successful!");
       setShowFormModal(false);
       reset();
+      queryClient.invalidateQueries({ queryKey: ["sites"] });
     },
     onError: (error: { message: string }) => {
       console.log(error);

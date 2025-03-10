@@ -198,6 +198,7 @@ const Content = () => {
           src={images.authPage.loginBanner}
           alt="banner"
           height={500}
+          priority
           width={500}
         />
       </div>

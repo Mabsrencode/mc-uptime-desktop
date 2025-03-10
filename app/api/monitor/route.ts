@@ -87,3 +87,80 @@ export async function GET(req: Request) {
     );
   }
 }
+
+export async function DELETE(req: Request) {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("mc-access-tk")?.value;
+
+    if (!accessToken) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id } = await req.json();
+
+    const response = await fetch(`${environments.API_URL}/site/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Backend error:", errorData);
+      return NextResponse.json(
+        { message: "Backend error", error: errorData },
+        { status: response.status }
+      );
+    }
+
+    return NextResponse.json({ message: "Monitor deleted successfully" });
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return NextResponse.json(
+      { message: "Server error", error: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(req: Request) {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("mc-access-tk")?.value;
+
+    if (!accessToken) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id, url, interval, monitorType } = await req.json();
+
+    const response = await fetch(`${environments.API_URL}/site/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url, interval, monitorType }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Backend error:", errorData);
+      return NextResponse.json(
+        { message: "Backend error", error: errorData },
+        { status: response.status }
+      );
+    }
+
+    return NextResponse.json({ message: "Monitor updated successfully" });
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return NextResponse.json(
+      { message: "Server error", error: String(error) },
+      { status: 500 }
+    );
+  }
+}

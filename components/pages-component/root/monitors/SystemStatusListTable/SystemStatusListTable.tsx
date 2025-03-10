@@ -1,13 +1,14 @@
 "use client";
 
 import React, { FC, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { BsThreeDots } from "react-icons/bs";
 import { WiRefresh } from "react-icons/wi";
 
 import TimeDelta from "@/components/reusable/TimeDelta/TimeDelta";
 import Image from "next/image";
+import toast from "react-hot-toast";
 
 interface Monitor {
   id: string;
@@ -31,7 +32,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
 }) => {
   const { data: authData } = useAuthStore();
   const userId = authData?.user?.userID;
-
+  const queryClient = useQueryClient();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
 
   const fetchMonitors = async (): Promise<Monitor[]> => {
@@ -61,7 +62,48 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     refetchInterval: 1000,
     retry: false,
   });
+  const deleteMonitor = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch("/api/monitor", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+      if (!response.ok) throw new Error("Failed to delete monitor");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sites"] });
+      toast.success("Monitor deleted successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete monitor");
+    },
+  });
 
+  // const editMonitor = useMutation({
+  //   mutationFn: async (updatedMonitor: Monitor) => {
+  //     const response = await fetch("/api/monitor", {
+  //       method: "PUT",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(updatedMonitor),
+  //     });
+  //     if (!response.ok) throw new Error("Failed to update monitor");
+  //     return response.json();
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["sites"] });
+  //     toast.success("Monitor updated successfully");
+  //     setEditingMonitor(null);
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message || "Failed to update monitor");
+  //   },
+  // });
   if (isLoading)
     return (
       <div className="flex flex-col gap-2 mt-6">
@@ -177,7 +219,10 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                     <button className="block w-full text-left px-2 py-1 hover:bg-gray-200 cursor-pointer">
                       Edit
                     </button>
-                    <button className="block w-full text-left px-2 py-1 hover:bg-gray-200 cursor-pointer">
+                    <button
+                      onClick={() => deleteMonitor.mutate(monitor.id)}
+                      className="block w-full text-left px-2 py-1 hover:bg-gray-200 cursor-pointer"
+                    >
                       Delete
                     </button>
                   </div>
