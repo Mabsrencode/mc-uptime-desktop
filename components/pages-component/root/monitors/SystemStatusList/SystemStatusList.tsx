@@ -10,7 +10,7 @@ import { IoIosClose } from "react-icons/io";
 import Image from "next/image";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { z } from "zod";
-import { useForm, Resolver, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import SystemStatusListTable from "../SystemStatusListTable/SystemStatusListTable";
@@ -110,7 +110,7 @@ const SystemStatusList = () => {
   return (
     <>
       {showFormModal && (
-        <div className="fixed flex justify-center items-center w-full h-full px-24">
+        <div className="fixed flex justify-center items-center w-full h-full px-24 z-[1000]">
           <div
             onClick={() => setShowFormModal(false)}
             style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
@@ -359,7 +359,7 @@ const SystemStatusList = () => {
             </button>
           </div>
         </div>
-        <SystemStatusListTable />
+        <SystemStatusListTable handleShowForm={() => setShowFormModal(true)} />
       </section>
     </>
   );
