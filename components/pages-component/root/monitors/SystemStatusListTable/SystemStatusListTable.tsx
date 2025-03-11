@@ -9,6 +9,8 @@ import { WiRefresh } from "react-icons/wi";
 import TimeDelta from "@/components/reusable/TimeDelta/TimeDelta";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { MdError } from "react-icons/md";
+import Link from "next/link";
 
 interface Monitor {
   id: string;
@@ -22,6 +24,7 @@ interface SiteStatus {
   id: number;
   up: boolean;
   checkedAt: string;
+  error?: string;
 }
 interface SiteStatusData {
   sites: SiteStatus[];
@@ -199,9 +202,25 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               </div>
 
               <div className="relative flex items-center">
+                {st?.error && (
+                  <div className="flex items-center gap-1">
+                    <div>
+                      <Link
+                        className="text-xs text-nowrap bg-black/40 hover:bg-black/60 transition-all rounded py-1 px-2"
+                        href={""}
+                      >
+                        View Incident
+                      </Link>
+                    </div>
+                    <div className="flex gap-1">
+                      <MdError className="text-red-700" />
+                      <p className="text-xs text-gray-400">{st?.error}</p>
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center mr-12 text-gray-400">
                   <WiRefresh className="text-3xl" />
-                  <p className="text-xs">
+                  <p className="text-xs text-nowrap">
                     {monitor.interval}
                     <span> {monitor.interval >= 60 ? "hour" : "min"}</span>
                   </p>
@@ -212,7 +231,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                       prev === monitor.id ? null : monitor.id
                     )
                   }
-                  className="hover:bg-white/20 rounded-full cursor-pointer p-1 text-3xl"
+                  className="hover:bg-white/20 rounded-full cursor-pointer p-1 text-2xl"
                 />
                 {openDropdownId === monitor.id && (
                   <div className="absolute top-8 -right-16 z-10 bg-white text-black shadow-lg rounded-md p-2">
