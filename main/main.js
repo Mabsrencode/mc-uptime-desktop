@@ -5,7 +5,7 @@ let mainWindow;
 let splashScreen;
 
 const createWindow = async () => {
-  // Menu.setApplicationMenu(false);
+  // Menu.setApplicationMenu(null);
 
   splashScreen = new BrowserWindow({
     width: 400,
@@ -22,12 +22,15 @@ const createWindow = async () => {
     height: 700,
     minWidth: 1200,
     minHeight: 700,
-    // fullscreen: true,
     icon: path.join(__dirname, "../public/icon.ico"),
     show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       devTools: !app.isPackaged,
+      nodeIntegration: false,
+      contextIsolation: true,
+      enableRemoteModule: false,
+      sandbox: true,
     },
   });
 
@@ -36,7 +39,7 @@ const createWindow = async () => {
     const appServe = serve({ directory: path.join(__dirname, "../out") });
 
     await appServe(mainWindow);
-    mainWindow.loadURL("app://-");
+    mainWindow.loadURL("app://./index.html");
   } else {
     mainWindow.loadURL("http://localhost:3000");
     mainWindow.webContents.openDevTools();
@@ -46,9 +49,35 @@ const createWindow = async () => {
   }
 
   mainWindow.once("ready-to-show", () => {
-    splashScreen.close();
+    if (splashScreen && !splashScreen.isDestroyed()) {
+      splashScreen.close();
+    }
     mainWindow.show();
   });
+
+  mainWindow.webContents.session.webRequest.onHeadersReceived(
+    (details, callback) => {
+      const isDev = !app.isPackaged;
+      callback({
+        responseHeaders: {
+          ...details.responseHeaders,
+          "Content-Security-Policy": [
+            `default-src 'self'; 
+             script-src 'self' ${
+               isDev
+                 ? "'unsafe-inline' 'unsafe-eval'"
+                 : "'nonce-randomStringHere'"
+             }; 
+             style-src 'self' 'unsafe-inline'; 
+             img-src 'self' data:; 
+             font-src 'self'; 
+             connect-src 'self' ${isDev ? "ws://localhost:*" : ""}; 
+             frame-src 'none';`,
+          ],
+        },
+      });
+    }
+  );
 };
 
 app.whenReady().then(() => {
@@ -58,5 +87,11 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
+  }
+});
+
+app.on("activate", () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
   }
 });

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { nanoid } from "nanoid";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -22,8 +23,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const nonce = nanoid();
+  const isDev = process.env.NODE_ENV === "development";
+
   return (
     <html lang="en">
+      <head>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content={`
+            default-src 'self';
+            script-src 'self' ${
+              isDev ? "'unsafe-inline' 'unsafe-eval'" : `'nonce-${nonce}'`
+            };
+            style-src 'self' 'unsafe-inline';
+            img-src 'self' data:;
+            font-src 'self';
+            connect-src 'self' ${isDev ? "ws://localhost:*" : ""};
+            frame-src 'none';
+          `}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
