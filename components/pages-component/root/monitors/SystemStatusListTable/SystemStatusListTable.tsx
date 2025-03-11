@@ -1,11 +1,11 @@
 "use client";
 
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { BsThreeDots } from "react-icons/bs";
 import { WiRefresh } from "react-icons/wi";
-
+import { useStatusStore } from "@/stores/useStatusStore";
 import TimeDelta from "@/components/reusable/TimeDelta/TimeDelta";
 import Image from "next/image";
 import toast from "react-hot-toast";
@@ -20,19 +20,20 @@ interface Monitor {
   monitorType: string;
   interval: number;
 }
-interface SiteStatus {
+export interface SiteStatus {
   id: number;
   up: boolean;
   checkedAt: string;
   error?: string;
 }
-interface SiteStatusData {
+export interface SiteStatusData {
   sites: SiteStatus[];
 }
 
 const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   handleShowForm,
 }) => {
+  const { setStatus } = useStatusStore();
   const { data: authData } = useAuthStore();
   const userId = authData?.user?.userID;
   const queryClient = useQueryClient();
@@ -65,6 +66,11 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     refetchInterval: 1000,
     retry: false,
   });
+  useEffect(() => {
+    if (status) {
+      setStatus(status);
+    }
+  }, [status, setStatus]);
   const deleteMonitor = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch("/api/monitor", {

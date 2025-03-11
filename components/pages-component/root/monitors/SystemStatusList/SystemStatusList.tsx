@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import SystemStatusListTable from "../SystemStatusListTable/SystemStatusListTable";
+import SystemStatusCard from "../SystemStatusCard/SystemStatusCard";
+import { useStatusStore } from "@/stores/useStatusStore";
 const monitorTypes = [
   {
     label: "HTTP / website monitoring",
@@ -54,6 +56,7 @@ const urlSchema = z.object({
 type FormValues = z.infer<typeof urlSchema>;
 
 const SystemStatusList = () => {
+  const { status } = useStatusStore();
   const { data } = useAuthStore();
   const [value, setValue] = useState(5);
   const options = [1, 5, 30, 60, 720, 1440];
@@ -108,9 +111,8 @@ const SystemStatusList = () => {
   const onSubmit = (data: FormValues) => {
     handleAddURL.mutate(data);
   };
-
   return (
-    <>
+    <div className="flex w-full h-full pr-4">
       {showFormModal && (
         <div className="fixed flex justify-center items-center w-full h-full px-24 z-[1000]">
           <div
@@ -363,7 +365,10 @@ const SystemStatusList = () => {
         </div>
         <SystemStatusListTable handleShowForm={() => setShowFormModal(true)} />
       </section>
-    </>
+      {status && status.sites.length > 0 && (
+        <SystemStatusCard monitors={status.sites} />
+      )}
+    </div>
   );
 };
 
