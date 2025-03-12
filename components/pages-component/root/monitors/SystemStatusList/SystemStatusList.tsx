@@ -47,7 +47,7 @@ const monitorTypes = [
   },
 ];
 
-const urlSchema = z.object({
+export const urlSchema = z.object({
   url: z.string(),
   notifyBy_email: z.boolean(),
   notifyBy_number: z.boolean(),

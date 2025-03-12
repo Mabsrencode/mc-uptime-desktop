@@ -25,6 +25,7 @@ export interface SiteStatus {
   up: boolean;
   checkedAt: string;
   error?: string;
+  incidentId: string;
 }
 export interface SiteStatusData {
   sites: SiteStatus[];
@@ -52,7 +53,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     const data = await response.json();
     return data;
   };
-  const { data, isLoading, isFetching, error } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["sites", userId],
     queryFn: fetchMonitors,
     refetchInterval: 10000,
@@ -213,7 +214,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                     <div>
                       <Link
                         className="text-xs text-nowrap bg-black/40 hover:bg-black/60 transition-all rounded py-1 px-2"
-                        href={""}
+                        href={`/incidents/${st.incidentId}`}
                       >
                         View Incident
                       </Link>
