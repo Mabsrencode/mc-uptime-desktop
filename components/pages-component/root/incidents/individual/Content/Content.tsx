@@ -7,8 +7,8 @@ import React from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { MdOutlineMonitor } from "react-icons/md";
 import { useRouter } from "next/navigation";
-import TimeDelta from "@/components/reusable/TimeDelta/TimeDelta";
-import { formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
+import { TZDate } from "@date-fns/tz";
 interface IncidentI {
   id: string;
   up: boolean;
@@ -40,7 +40,6 @@ const Content: React.FC<{ incidentId: string; siteId: string }> = ({
     queryFn: handleGetIncident,
     staleTime: 50000,
   });
-  console.log(data);
   if (isLoading) return <UptimeLoading />;
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
@@ -91,7 +90,7 @@ const Content: React.FC<{ incidentId: string; siteId: string }> = ({
             {!data?.up ? "Ongoing" : "Resolved"}
           </h2>
           <p className="mt-1 text-gray-400 text-xs">
-            Started {data && <TimeDelta dt={data?.checkedAt} />}{" "}
+            Started at {data && format(new TZDate(data.checkedAt), "PPpp")}
           </p>
         </div>
         <div className="flex-1 p-6 bg-green-950/90 rounded mt-6 manrope font-bold">
