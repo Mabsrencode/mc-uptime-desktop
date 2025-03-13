@@ -1,15 +1,22 @@
 "use client";
+import PingStatus from "@/components/reusable/PingStatus/PingStatus";
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import React from "react";
 import { IoChevronBack } from "react-icons/io5";
 interface IncidentI {
-  checkAt: string;
-  details: string;
-  error: string;
   id: string;
-  up: string;
+  up: boolean;
+  checkedAt: string;
+  error: string | null;
+  details: string | null;
+  siteId: string;
+  url: string;
+  monitorType: string;
+  interval: number;
+  email: string;
+  mobile_number?: string | null;
 }
 const Content: React.FC<{ incidentId: string; siteId: string }> = ({
   incidentId,
@@ -30,7 +37,6 @@ const Content: React.FC<{ incidentId: string; siteId: string }> = ({
     staleTime: 50000,
   });
   if (isLoading) return <UptimeLoading />;
-  console.log(data);
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6">
       <Link
@@ -40,8 +46,13 @@ const Content: React.FC<{ incidentId: string; siteId: string }> = ({
         <IoChevronBack className="inline" />
         Incidents
       </Link>
-      <div className="w-full">
-        <div></div>
+      <div className="w-full flex items-center justify-between gap-6 mt-12">
+        <div className="flex items-center gap-2">
+          <div>
+            <PingStatus up={data?.up ?? false} />
+          </div>
+          <div></div>
+        </div>
         <div></div>
       </div>
     </section>
