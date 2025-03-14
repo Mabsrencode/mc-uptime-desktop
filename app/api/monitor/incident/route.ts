@@ -20,7 +20,7 @@ export async function GET(req: Request) {
       );
     }
     const response = await fetch(
-      `${environments.API_URL}/report/${incidentId}/${siteId}`,
+      `${environments.API_URL}/report/${incidentId}`,
       {
         method: "GET",
         headers: {

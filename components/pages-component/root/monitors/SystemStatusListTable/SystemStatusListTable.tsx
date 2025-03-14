@@ -214,7 +214,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                     <div>
                       <Link
                         className="text-xs text-nowrap bg-black/40 hover:bg-black/60 transition-all rounded py-1 px-2"
-                        href={`/incidents/${st.incidentId}/${monitor.id}`}
+                        href={`/incidents/${st.incidentId}`}
                       >
                         View Incident
                       </Link>

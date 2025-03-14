@@ -21,14 +21,11 @@ interface IncidentI {
   interval: number;
   email: string;
 }
-const Content: React.FC<{ incidentId: string; siteId: string }> = ({
-  incidentId,
-  siteId,
-}) => {
+const Content: React.FC<{ incidentId: string }> = ({ incidentId }) => {
   const router = useRouter();
   const handleGetIncident = async () => {
     const response = await fetch(
-      `/api/monitor/incident?incidentId=${incidentId}&siteId=${siteId}`
+      `/api/monitor/incident?incidentId=${incidentId}`
     );
 
     if (!response.ok) throw new Error("Failed to fetch monitors");
@@ -36,7 +33,7 @@ const Content: React.FC<{ incidentId: string; siteId: string }> = ({
     return data;
   };
   const { data, isLoading } = useQuery<IncidentI>({
-    queryKey: ["incident", incidentId, siteId],
+    queryKey: ["incident", incidentId],
     queryFn: handleGetIncident,
     staleTime: 50000,
   });
