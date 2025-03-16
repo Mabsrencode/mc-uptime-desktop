@@ -34,7 +34,7 @@ export interface SiteStatusData {
 const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   handleShowForm,
 }) => {
-  const { setStatus } = useStatusStore();
+  // const { setStatus } = useStatusStore();
   const { data: authData } = useAuthStore();
   const userId = authData?.user?.userID;
   const queryClient = useQueryClient();
@@ -67,11 +67,11 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     refetchInterval: 1000,
     retry: false,
   });
-  useEffect(() => {
-    if (status) {
-      setStatus(status);
-    }
-  }, [status, setStatus]);
+  // useEffect(() => {
+  //   if (status) {
+  //     setStatus(status);
+  //   }
+  // }, [status, setStatus]);
   const deleteMonitor = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch("/api/monitor", {
@@ -114,6 +114,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   //     toast.error(error.message || "Failed to update monitor");
   //   },
   // });
+  console.log(status);
   if (isLoading)
     return (
       <div className="flex flex-col gap-2 mt-6">
@@ -175,6 +176,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       ) : (
         data?.map((monitor) => {
           const st = status?.sites.find((s) => s.id.toString() === monitor.id);
+          console.log(st);
           return (
             <div
               key={monitor.id}

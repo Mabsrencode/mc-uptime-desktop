@@ -1,7 +1,12 @@
+import Content from "@/components/pages-component/root/incidents/Content/Content";
 import React from "react";
 
 const page = () => {
-  return <div>page</div>;
+  return (
+    <>
+      <Content />
+    </>
+  );
 };
 
 export default page;
