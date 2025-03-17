@@ -11,23 +11,21 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
-    if (!userId) {
+    const siteId = searchParams.get("siteId");
+    // const incidentId = searchParams.get("incidentId");
+    if (!siteId) {
       return NextResponse.json(
         { message: "Incident ID is required" },
         { status: 400 }
       );
     }
-    const response = await fetch(
-      `${environments.API_URL}/incidents/${userId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${environments.API_URL}/incident/${siteId}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
     const data = await response.json();
     console.log(data);
     if (!response.ok) {

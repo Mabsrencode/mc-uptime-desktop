@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { BsThreeDots } from "react-icons/bs";
@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { MdError } from "react-icons/md";
 import Link from "next/link";
 import MonitorForm from "@/components/reusable/MonitorForm/MonitorForm";
-
+import { useStatusStore } from "@/stores/useStatusStore";
 interface Checks {
   up: boolean;
 }
@@ -49,6 +49,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   handleShowForm,
 }) => {
   const { data: authData } = useAuthStore();
+  const { setStatus } = useStatusStore();
   const userId = authData?.user?.userID;
   const queryClient = useQueryClient();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
@@ -81,6 +82,11 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     refetchInterval: 1000,
     retry: false,
   });
+  useEffect(() => {
+    if (status) {
+      setStatus(status);
+    }
+  }, [status, setStatus]);
 
   const deleteMonitor = useMutation({
     mutationFn: async (id: string) => {
@@ -213,7 +219,12 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                       ></span>
                     </span>
                     <div>
-                      <p className="text-sm font-semibold">{monitor.url}</p>
+                      <Link
+                        href={`/incidents/${monitor.id}`}
+                        className="text-sm font-semibold cursor-pointer hover:underline"
+                      >
+                        {monitor.url}
+                      </Link>
                       <div className="text-gray-400 text-xs mt-1 flex gap-1 items-center">
                         <p className="border border-white/20 inline py-[2px] px-[3px] rounded bg-black/40">
                           {monitor.monitorType}
