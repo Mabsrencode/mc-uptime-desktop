@@ -365,9 +365,9 @@ const SystemStatusList = () => {
         </div>
         <SystemStatusListTable handleShowForm={() => setShowFormModal(true)} />
       </section>
-      {status && status.sites.length > 0 && (
+      {/* {status && status.sites.length > 0 && (
         <SystemStatusCard monitors={status.sites} />
-      )}
+      )} */}
     </div>
   );
 };
