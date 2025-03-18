@@ -12,7 +12,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   };
   const { data, isLoading, error } = useQuery({
     queryKey: ["monitor-status", siteId],
-    queryFn: handleGetMonitor,
+    queryFn: handleGetMonitor,  //!staleTime 60000
   });
   if (isLoading) return <UptimeLoading />;
   if (error)
