@@ -38,6 +38,7 @@ const Content = () => {
         <div></div>
       </div>
       <TableStatus
+        bgColored
         data={data}
         bordered
         showUrl

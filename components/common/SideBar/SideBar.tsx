@@ -64,7 +64,9 @@ const SideBar = () => {
             </span>
           </div>
           {isSideBarOpen && (
-            <h1 className="text-green-500 font-semibold manrope">MC Uptime</h1>
+            <h1 className="text-white font-bold manrope">
+              MC Uptime<span className="text-green-500">.</span>
+            </h1>
           )}
         </Link>
         <nav className="mt-12">

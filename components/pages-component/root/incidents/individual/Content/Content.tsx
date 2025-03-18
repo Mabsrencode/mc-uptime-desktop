@@ -141,13 +141,14 @@ const Content: React.FC<{ incidentId: string }> = ({ incidentId }) => {
         {relatedIncidents.length > 0 ? (
           <>
             <TableStatus
+              bgColored={false}
               data={{ data: relatedIncidents }}
               handleNavigateIncident={handleNavigateIncident}
               bordered={false}
               showUrl={false}
             />
             <div className="flex justify-center mt-4 w-full px-6">
-              <button className="bg-black/60 text-white px-4 py-2 rounded-lg hover:bg-black/50 cursor-pointer text-xs w-full shadow">
+              <button className="bg-[#000d07]/70 text-white px-4 py-2 rounded-lg hover:bg-black/50 cursor-pointer text-xs w-full shadow">
                 Load more incidents
               </button>
             </div>

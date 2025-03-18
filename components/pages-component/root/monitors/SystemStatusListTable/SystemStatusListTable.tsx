@@ -151,6 +151,19 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   if (error) return <div>Error loading data.</div>;
   return (
     <div className="text-white w-full mt-6">
+      <div>
+        <input
+          type="text"
+          placeholder="Search by name or URL"
+          className="border px-2 py-1"
+        />
+
+        <select className="border px-2 py-1 ml-2">
+          <option value="">All Tags</option>
+          <option value="HTTP">HTTP</option>
+          <option value="Ping">Ping</option>
+        </select>
+      </div>
       {data && data.length === 0 ? (
         <div className="relative w-full mt-24 overflow-hidden z-10">
           <div className="relative ">

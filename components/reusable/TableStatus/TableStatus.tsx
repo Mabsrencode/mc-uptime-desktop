@@ -26,6 +26,7 @@ interface IncidentData {
   handleNavigateIncident: (id: string) => void;
   bordered: boolean;
   showUrl: boolean;
+  bgColored: boolean;
 }
 
 const TableStatus: React.FC<IncidentData> = ({
@@ -33,17 +34,22 @@ const TableStatus: React.FC<IncidentData> = ({
   handleNavigateIncident,
   bordered,
   showUrl,
+  bgColored,
 }) => {
   return (
     <div
-      className={`overflow-hidden ${
+      className={`overflow-hidden ${bgColored && "bg-green-950/90"} ${
         bordered && "border border-white/20 rounded"
       }`}
     >
       <div className="w-full overflow-auto">
         <table className="min-w-full border-collapse text-left">
           <thead>
-            <tr className="border-b border-white/20 text-gray-400 text-xs manrope">
+            <tr
+              className={`border-b border-white/20 ${
+                bgColored && "bg-[#000d07]/70"
+              } text-xs manrope`}
+            >
               <th className="px-6 py-3 whitespace-nowrap">Status</th>
               {showUrl && (
                 <th className="px-6 py-3 whitespace-nowrap">Monitor</th>
