@@ -47,7 +47,6 @@ const Content = () => {
       return response.json();
     },
     onSuccess: (data) => {
-      console.log(data);
       if (data) {
         useAuthStore.setState({
           data: {

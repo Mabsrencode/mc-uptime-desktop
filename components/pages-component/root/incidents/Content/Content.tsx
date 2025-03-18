@@ -9,7 +9,7 @@ const Content = () => {
   const { data: user } = useAuthStore();
   const router = useRouter();
   const handleNavigateIncident = (id: string) => {
-    router.push(`/incident/${id}`);
+    router.push(`/incidents/${id}`);
   };
   const userId = user && user.user && user.user.userID;
   const handleGetAllIncidents = async () => {
@@ -39,6 +39,8 @@ const Content = () => {
       </div>
       <TableStatus
         data={data}
+        bordered
+        showUrl
         handleNavigateIncident={handleNavigateIncident}
       />
     </section>

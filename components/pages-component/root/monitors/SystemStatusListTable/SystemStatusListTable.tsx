@@ -147,10 +147,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         ))}
       </div>
     );
-  console.log(data);
 
   if (error) return <div>Error loading data.</div>;
-
   return (
     <div className="text-white w-full mt-6">
       {data && data.length === 0 ? (
@@ -193,8 +191,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         </div>
       ) : (
         data?.map((monitor) => {
-          console.log(monitor.id);
           const st = status?.sites.find((s) => s.id.toString() === monitor.id);
+          const reverseIncidentData = monitor.incident.toReversed();
           return (
             <div key={monitor.id}>
               {editingMonitor?.id === monitor.id ? (
@@ -219,12 +217,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                       ></span>
                     </span>
                     <div>
-                      <Link
-                        href={`/incidents/${monitor.id}`}
-                        className="text-sm font-semibold cursor-pointer hover:underline"
-                      >
-                        {monitor.url}
-                      </Link>
+                      <p className="text-sm font-semibold ">{monitor.url}</p>
+
                       <div className="text-gray-400 text-xs mt-1 flex gap-1 items-center">
                         <p className="border border-white/20 inline py-[2px] px-[3px] rounded bg-black/40">
                           {monitor.monitorType}
@@ -244,7 +238,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                         <div>
                           <Link
                             className="text-xs text-nowrap bg-black/40 hover:bg-black/60 transition-all rounded py-1 px-2"
-                            href={`/incidents/${monitor.id}`}
+                            href={`/incidents/${reverseIncidentData[0].id}`}
                           >
                             View Incident
                           </Link>

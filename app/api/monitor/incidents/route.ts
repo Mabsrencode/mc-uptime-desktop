@@ -29,7 +29,6 @@ export async function GET(req: Request) {
       }
     );
     const data = await response.json();
-    console.log(data);
     if (!response.ok) {
       const errorData = await response.json();
       console.error("Encore API error:", errorData);

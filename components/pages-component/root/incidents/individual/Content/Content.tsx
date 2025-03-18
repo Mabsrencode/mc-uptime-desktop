@@ -10,12 +10,12 @@ import { useRouter } from "next/navigation";
 import {
   format,
   formatDistanceToNow,
-  differenceInMinutes,
-  differenceInSeconds,
-  differenceInHours,
+  formatDuration,
+  intervalToDuration,
 } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 import TableStatus from "@/components/reusable/TableStatus/TableStatus";
+
 interface IncidentLogsData {
   id: string;
   siteId: string;
@@ -32,27 +32,39 @@ interface IncidentLogsData {
 }
 
 interface IncidentLogsResponse {
-  data: IncidentLogsData[];
-}
-const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
-  const router = useRouter();
-  const handleNavigateIncident = (id: string) => {
-    router.push(`/incident/${id}`);
+  data: {
+    incident: IncidentLogsData;
+    relatedIncidents: IncidentLogsData[];
   };
+}
+
+const Content: React.FC<{ incidentId: string }> = ({ incidentId }) => {
+  const router = useRouter();
+
+  const handleNavigateIncident = (id: string) => {
+    router.push(`/incidents/${id}`);
+  };
+
   const handleGetIncident = async () => {
-    const response = await fetch(`/api/monitor/incident?siteId=${siteId}`);
+    const response = await fetch(
+      `/api/monitor/incident?incidentId=${incidentId}`
+    );
 
     if (!response.ok) throw new Error("Failed to fetch monitors");
     const data = await response.json();
     return data;
   };
+
   const { data, isLoading } = useQuery<IncidentLogsResponse>({
-    queryKey: ["incident", siteId],
+    queryKey: ["incident", incidentId],
     queryFn: handleGetIncident,
     staleTime: 50000,
   });
+
   if (isLoading) return <UptimeLoading />;
-  console.log(data);
+
+  const incident = data?.data.incident;
+  const relatedIncidents = data?.data.relatedIncidents || [];
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
       <Link
@@ -64,16 +76,14 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       </Link>
       <div className="w-full flex items-center justify-between gap-6 mt-12">
         <div className="flex items-center gap-4">
-          <div>
-            <PingStatus up={data?.data[0]?.up ?? false} />
-          </div>
+          <PingStatus up={incident?.up ?? false} />
           <div>
             <h1 className="text-xl manrope font-bold">
-              Ongoing incident on {data?.data[0].url.split("//")[1]}
+              Ongoing incident on {incident?.url.split("//")[1]}
             </h1>
             <p className="text-gray-400 mt-1 text-xs">
-              {data?.data[0].monitorType === "HTTP" ? "HTTP/S" : "HTTP"} monitor
-              for {data?.data[0].url}
+              {incident?.monitorType === "HTTP" ? "HTTP/S" : "HTTP"} monitor for{" "}
+              {incident?.url}
             </p>
           </div>
         </div>
@@ -89,34 +99,30 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       </div>
       <div className="p-6 bg-green-950/90 rounded mt-6 manrope font-bold">
         <span className="text-xs">Root cause</span>
-        <h2>{data?.data[0]?.error}</h2>
+        <h2>{incident?.error || "N/A"}</h2>
       </div>
       <div className="flex justify-between gap-6">
         <div className="flex-1 p-6 bg-green-950/90 rounded mt-6 manrope font-bold">
           <span className="text-xs">Status</span>
-          <h2
-            className={`${
-              data?.data[0].up ? "text-green-500" : "text-red-500"
-            } text-xl`}
-          >
-            {!data?.data[0].up ? "Ongoing" : "Resolved"}
+          <h2 className={incident?.up ? "text-green-500" : "text-red-500"}>
+            {!incident?.up ? "Ongoing" : "Resolved"}
           </h2>
           <p className="mt-1 text-gray-400 text-xs">
             Started at{" "}
-            {data && format(new TZDate(data?.data[0].startTime), "PPpp")}
+            {incident && format(new TZDate(incident.startTime), "PPpp")}
           </p>
         </div>
         <div className="flex-1 p-6 bg-green-950/90 rounded mt-6 manrope font-bold">
           <span className="text-xs">Duration</span>
           <h2 className="text-xl">
-            {data &&
-              formatDistanceToNow(
-                new Date(
-                  data?.data[0].endTime
-                    ? data?.data[0].endTime
-                    : data?.data[0].startTime
+            {incident?.startTime && incident?.endTime
+              ? formatDuration(
+                  intervalToDuration({
+                    start: new Date(incident.startTime),
+                    end: new Date(incident.endTime),
+                  })
                 )
-              )}
+              : incident && formatDistanceToNow(new Date(incident.startTime))}
           </h2>
         </div>
       </div>
@@ -125,25 +131,32 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
           Response details<span className="text-2xl text-green-500">.</span>
         </span>
         <p className="mt-1 p-2 bg-[#000d07]/70 border border-white/20 rounded text-gray-400 text-sm">
-          {data?.data[0]?.details}
+          {incident?.details || "No details available"}
         </p>
       </div>
       <div className="w-full py-6 bg-green-950/90 rounded mt-6">
         <h3 className="manrope font-bold text-xl mx-6">
-          Latest Incidents
-          <span className="text-green-500">.</span>
+          Latest Incidents<span className="text-green-500">.</span>
         </h3>
-        {data && (
-          <TableStatus
-            data={data}
-            handleNavigateIncident={handleNavigateIncident}
-          />
+        {relatedIncidents.length > 0 ? (
+          <>
+            <TableStatus
+              data={{ data: relatedIncidents }}
+              handleNavigateIncident={handleNavigateIncident}
+              bordered={false}
+              showUrl={false}
+            />
+            <div className="flex justify-center mt-4 w-full px-6">
+              <button className="bg-black/60 text-white px-4 py-2 rounded-lg hover:bg-black/50 cursor-pointer text-xs w-full shadow">
+                Load more incidents
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="text-center text-gray-400 mt-4">
+            No other incidents found.
+          </p>
         )}
-        <div className="flex justify-center mt-4 w-full p-6">
-          <button className="bg-black/60 text-white px-4 py-2 rounded-lg hover:bg-black/50 cursor-pointer text-xs w-full shadow">
-            Load more incidents
-          </button>
-        </div>
       </div>
     </section>
   );

@@ -86,7 +86,6 @@ const Content = () => {
       }
     },
     onSuccess: (data) => {
-      console.log(data);
       if (data instanceof Error) {
         toast.error(data.message);
       } else {
