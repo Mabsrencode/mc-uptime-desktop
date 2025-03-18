@@ -88,13 +88,13 @@ const Content: React.FC<{ incidentId: string }> = ({ incidentId }) => {
           </div>
         </div>
         <div>
-          <button
-            onClick={() => router.back()}
+          <Link
+            href={"/monitors"}
             className="flex items-center gap-2 py-2 px-3 bg-green-700 rounded text-xs cursor-pointer"
           >
             <MdOutlineMonitor />
             Go to Monitor
-          </button>
+          </Link>
         </div>
       </div>
       <div className="p-6 bg-green-950/90 rounded mt-6 manrope font-bold">

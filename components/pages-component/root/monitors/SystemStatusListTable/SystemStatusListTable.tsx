@@ -217,7 +217,12 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                       ></span>
                     </span>
                     <div>
-                      <p className="text-sm font-semibold ">{monitor.url}</p>
+                      <Link
+                        href={`/monitors/${monitor.id}`}
+                        className="text-sm font-semibold hover:underline"
+                      >
+                        {monitor.url}
+                      </Link>
 
                       <div className="text-gray-400 text-xs mt-1 flex gap-1 items-center">
                         <p className="border border-white/20 inline py-[2px] px-[3px] rounded bg-black/40">
