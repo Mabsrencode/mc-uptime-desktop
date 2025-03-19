@@ -1,7 +1,11 @@
 import React, { FC, useEffect, useState } from "react";
+import "./style.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { BsThreeDots } from "react-icons/bs";
+import { IoIosArrowDown } from "react-icons/io";
+import { GoFilter } from "react-icons/go";
+import { FaTrash } from "react-icons/fa";
 import { WiRefresh } from "react-icons/wi";
 import TimeDelta from "@/components/reusable/TimeDelta/TimeDelta";
 import Image from "next/image";
@@ -54,10 +58,15 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const queryClient = useQueryClient();
   const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const [editingMonitor, setEditingMonitor] = useState<Monitor | null>(null);
+  const [openBulk, setOpenBulk] = useState<boolean>(false);
+  const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const [searchValue, setSearchValue] = useState<string>("");
 
   const fetchMonitors = async (): Promise<Monitor[]> => {
     if (!userId) return [];
-    const response = await fetch(`/api/monitor?userId=${userId}`);
+    const response = await fetch(
+      `/api/monitor?userId=${userId}&search=${searchValue}`
+    );
     if (!response.ok) throw new Error("Failed to fetch monitors");
     return (await response.json()).data;
   };
@@ -69,7 +78,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     return data;
   };
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, isFetching, error } = useQuery({
     queryKey: ["sites", userId],
     queryFn: fetchMonitors,
     refetchInterval: 1000,
@@ -131,7 +140,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     },
   });
 
-  if (isLoading)
+  if (isLoading && isFetching)
     return (
       <div className="flex flex-col gap-2 mt-6">
         {Array.from({ length: 4 }).map((_, index) => (
@@ -148,21 +157,61 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       </div>
     );
 
-  if (error) return <div>Error loading data.</div>;
+  if (error) return <div>{error.message}</div>;
   return (
     <div className="text-white w-full mt-6">
-      <div>
-        <input
-          type="text"
-          placeholder="Search by name or URL"
-          className="border px-2 py-1"
-        />
-
-        <select className="border px-2 py-1 ml-2">
-          <option value="">All Tags</option>
-          <option value="HTTP">HTTP</option>
-          <option value="Ping">Ping</option>
-        </select>
+      <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
+        <div className="flex items-center gap-2">
+          <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
+            <input type="checkbox" id="bulk" />
+            <label htmlFor="">0/{data && data.length}</label>
+          </div>
+          <div className="relative">
+            <button
+              onClick={() => setOpenBulk(!openBulk)}
+              className=" border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center text-gray-400"
+            >
+              Bulk action <IoIosArrowDown />
+            </button>
+            {openBulk && (
+              <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden">
+                <div className="manrope text-gray-400 bg-[#000d07] w-full p-2">
+                  <h1>Monitor Actions</h1>
+                </div>
+                <button className="hover:bg-[#000d07] cursor-pointer w-full p-2 flex items-center gap-2">
+                  <FaTrash className="text-xs" /> Delete
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center">
+          <input
+            onChange={(e) => setSearchValue(e.target.value)}
+            type="text"
+            placeholder="Search by name or URL"
+            className="border border-white/20 outline-none px-2 py-1 rounded"
+          />
+          <select className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
+            <option value="HTTP" className="bg-green-950">
+              HTTP
+            </option>
+            <option value="Ping" className="bg-green-950">
+              Ping
+            </option>
+            <option value="Port" className="bg-green-950">
+              Port
+            </option>
+            <option value="IP Address" className="bg-green-950">
+              IP Address
+            </option>
+          </select>
+          <div className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
+            <span className="flex items-center gap-2">
+              <GoFilter className="inline" /> Filter
+            </span>
+          </div>
+        </div>
       </div>
       {data && data.length === 0 ? (
         <div className="relative w-full mt-24 overflow-hidden z-10">

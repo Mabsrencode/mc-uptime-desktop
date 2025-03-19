@@ -12,16 +12,17 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   };
   const { data, isLoading, error } = useQuery({
     queryKey: ["monitor-status", siteId],
-    queryFn: handleGetMonitor,  //!staleTime 60000
+    queryFn: handleGetMonitor,
+    staleTime: 6000,
   });
   if (isLoading) return <UptimeLoading />;
   if (error)
     return (
-      <section className="text-white">
+      <div className="text-white">
         <h1>Something went wrong from the server.</h1>
-      </section>
+      </div>
     );
-  return <div>Content</div>;
+  return <section>Content</section>;
 };
 
 export default Content;

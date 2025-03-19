@@ -50,6 +50,7 @@ export async function GET(req: Request) {
 
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
+    const search = searchParams.get("search");
 
     if (!userId) {
       return NextResponse.json(
@@ -58,26 +59,30 @@ export async function GET(req: Request) {
       );
     }
 
-    const response = await fetch(
-      `${environments.API_URL}/user-sites/${userId}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const url = search
+      ? `${
+          environments.API_URL
+        }/user-sites/${userId}?search=${encodeURIComponent(search)}`
+      : `${environments.API_URL}/user-sites/${userId}`;
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+
     const data = await response.json();
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Encore API error:", errorData);
+      console.error("Encore API error:", data);
       return NextResponse.json(
-        { message: "Error fetching data", error: errorData },
+        { message: "Error fetching data", error: data },
         { status: response.status }
       );
     }
+
     return NextResponse.json(data);
   } catch (error) {
     console.error("Fetch error:", error);
