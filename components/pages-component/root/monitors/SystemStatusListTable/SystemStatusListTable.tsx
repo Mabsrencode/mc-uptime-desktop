@@ -60,12 +60,12 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const [editingMonitor, setEditingMonitor] = useState<Monitor | null>(null);
   const [openBulk, setOpenBulk] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
-  const [searchValue, setSearchValue] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
-  const fetchMonitors = async (): Promise<Monitor[]> => {
+  const fetchMonitors = async (searchTerm: string = ""): Promise<Monitor[]> => {
     if (!userId) return [];
     const response = await fetch(
-      `/api/monitor?userId=${userId}&search=${searchValue}`
+      `/api/monitor?userId=${userId}&search=${searchTerm}`
     );
     if (!response.ok) throw new Error("Failed to fetch monitors");
     return (await response.json()).data;
@@ -78,9 +78,9 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     return data;
   };
 
-  const { data, isLoading, isFetching, error } = useQuery({
-    queryKey: ["sites", userId],
-    queryFn: fetchMonitors,
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["sites", userId, searchTerm],
+    queryFn: () => fetchMonitors(searchTerm),
     refetchInterval: 1000,
     retry: false,
     enabled: !!userId,
@@ -140,23 +140,6 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     },
   });
 
-  if (isLoading && isFetching)
-    return (
-      <div className="flex flex-col gap-2 mt-6">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-[60px] w-full bg-gray-400 animate-pulse rounded border border-white/20 p-4"
-          >
-            <div className="flex flex-col gap-2">
-              <div className="w-[40%] h-[12px] bg-gray-500 rounded-full"></div>
-              <div className="w-[20%] h-[12px] bg-gray-500 rounded-full"></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-
   if (error) return <div>{error.message}</div>;
   return (
     <div className="text-white w-full mt-6">
@@ -164,7 +147,9 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         <div className="flex items-center gap-2">
           <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
             <input type="checkbox" id="bulk" />
-            <label htmlFor="">0/{data && data.length}</label>
+            <label className="tracking-[4px]" htmlFor="bulk">
+              0/{data && data.length}
+            </label>
           </div>
           <div className="relative">
             <button
@@ -187,7 +172,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         </div>
         <div className="flex items-center">
           <input
-            onChange={(e) => setSearchValue(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             type="text"
             placeholder="Search by name or URL"
             className="border border-white/20 outline-none px-2 py-1 rounded"
@@ -213,44 +199,80 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
           </div>
         </div>
       </div>
-      {data && data.length === 0 ? (
-        <div className="relative w-full mt-24 overflow-hidden z-10">
-          <div className="relative ">
-            <div className="w-7/12">
-              <h1 className="text-white manrope font-bold text-6xl">
-                <span className="text-green-500">Monitor</span> your website in
-                a click<span className="text-green-500">.</span>
-              </h1>
-              <p className="text-lg mt-6 inter">
-                Keep an eye on your{" "}
-                <span className="text-green-500">
-                  website, API, email service, or any port or device on the
-                  network
-                </span>
-                . Ping our servers to track cron jobs and stay on top of
-                critical incidents.
-              </p>
+      {isLoading ? (
+        <div className="flex flex-col gap-2 mt-6">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-[60px] w-full bg-gray-400 animate-pulse rounded border border-white/20 p-4"
+            >
+              <div className="flex flex-col gap-2">
+                <div className="w-[40%] h-[12px] bg-gray-500 rounded-full"></div>
+                <div className="w-[20%] h-[12px] bg-gray-500 rounded-full"></div>
+              </div>
             </div>
-            <div className="mt-12">
-              <p className="text-lg inter">
-                Get started now, all set up in under 30 seconds! ⚡
-              </p>
-              <button
-                onClick={handleShowForm}
-                className="bg-green-700 hover:bg-green-700/70 rounded cursor-pointer px-12 py-2 block mt-4"
-              >
-                Create your first monitor
-              </button>
-            </div>
-          </div>
-          <Image
-            className="absolute top-0 -right-[500px]"
-            src={"/assets/images/banner.png"}
-            alt="banner"
-            width={900}
-            height={400}
-          />
+          ))}
         </div>
+      ) : error ? (
+        <div>{(error as any).message}</div>
+      ) : data && data.length === 0 ? (
+        data && data.length === 0 && searchTerm ? (
+          <div className="mt-24 mx-auto w-[400px]">
+            <h4 className="manrope text-center text-xl manrope font-bold">
+              🤐 No <span className="text-green-500">results</span> match your
+              criteria<span className="text-green-500">.</span>
+            </h4>
+            <p className="text-center text-xs mt-2 text-gray-400">
+              We haven't found any monitors based on your search and/or filter
+              criteria. Try expanding your search or clearing your filters to
+              get some results.
+            </p>
+            <button
+              onClick={() => setSearchTerm("")}
+              className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white flex items-center gap-1 mx-auto mt-4"
+            >
+              Clear all filters and search
+            </button>
+          </div>
+        ) : (
+          <div className="relative w-full mt-24 overflow-hidden z-10">
+            <div className="relative ">
+              <div className="w-7/12">
+                <h1 className="text-white manrope font-bold text-6xl">
+                  <span className="text-green-500">Monitor</span> your website
+                  in a click<span className="text-green-500">.</span>
+                </h1>
+                <p className="text-lg mt-6 inter">
+                  Keep an eye on your{" "}
+                  <span className="text-green-500">
+                    website, API, email service, or any port or device on the
+                    network
+                  </span>
+                  . Ping our servers to track cron jobs and stay on top of
+                  critical incidents.
+                </p>
+              </div>
+              <div className="mt-12">
+                <p className="text-lg inter">
+                  Get started now, all set up in under 30 seconds! ⚡
+                </p>
+                <button
+                  onClick={handleShowForm}
+                  className="bg-green-700 hover:bg-green-700/70 rounded cursor-pointer px-12 py-2 block mt-4"
+                >
+                  Create your first monitor
+                </button>
+              </div>
+            </div>
+            <Image
+              className="absolute top-0 -right-[500px]"
+              src={"/assets/images/banner.png"}
+              alt="banner"
+              width={900}
+              height={400}
+            />
+          </div>
+        )
       ) : (
         data?.map((monitor) => {
           const st = status?.sites.find((s) => s.id.toString() === monitor.id);

@@ -3,7 +3,7 @@ import PingStatus from "@/components/reusable/PingStatus/PingStatus";
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { MdOutlineMonitor } from "react-icons/md";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ import {
 } from "date-fns";
 import { TZDate } from "@date-fns/tz";
 import TableStatus from "@/components/reusable/TableStatus/TableStatus";
+import { FaClipboard } from "react-icons/fa";
 
 interface IncidentLogsData {
   id: string;
@@ -40,7 +41,20 @@ interface IncidentLogsResponse {
 
 const Content: React.FC<{ incidentId: string }> = ({ incidentId }) => {
   const router = useRouter();
+  const [isCopied, setIsCopied] = useState(false);
 
+  const handleCopy = () => {
+    const textToCopy = incident?.details || "No details available";
+    navigator.clipboard
+      .writeText(textToCopy)
+      .then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
   const handleNavigateIncident = (id: string) => {
     router.push(`/incidents/${id}`);
   };
@@ -130,8 +144,19 @@ const Content: React.FC<{ incidentId: string }> = ({ incidentId }) => {
         <span className="font-bold text-xl">
           Response details<span className="text-2xl text-green-500">.</span>
         </span>
-        <p className="mt-1 p-2 bg-[#000d07]/70 border border-white/20 rounded text-gray-400 text-sm">
+        <p className="relative mt-1 p-2 bg-[#000d07]/70 border border-white/20 rounded text-gray-400 text-sm overflow-hidden">
           {incident?.details || "No details available"}
+          <button
+            onClick={handleCopy}
+            className="absolute top-2 right-2 p-1 rounded bg-white cursor-pointer transition-colors"
+            title="Copy to clipboard"
+          >
+            {isCopied ? (
+              <span className="text-xs text-green-500">Copied!</span>
+            ) : (
+              <FaClipboard className="text-black" />
+            )}
+          </button>
         </p>
       </div>
       <div className="w-full py-6 bg-green-950/90 rounded mt-6">
