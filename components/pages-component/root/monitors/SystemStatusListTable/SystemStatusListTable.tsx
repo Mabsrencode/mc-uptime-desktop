@@ -194,7 +194,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               Bulk action <IoIosArrowDown />
             </button>
             {openBulk && (
-              <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden">
+              <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden z-[500]">
                 <div className="manrope text-gray-400 bg-[#000d07] w-full p-2 border-b border-white/20">
                   <h1>Monitor Actions</h1>
                 </div>
