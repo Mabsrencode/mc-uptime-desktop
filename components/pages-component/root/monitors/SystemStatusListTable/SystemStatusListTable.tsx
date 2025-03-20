@@ -61,6 +61,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const [openBulk, setOpenBulk] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedMonitors, setSelectedMonitors] = useState<string[]>([]);
 
   const fetchMonitors = async (searchTerm: string = ""): Promise<Monitor[]> => {
     if (!userId) return [];
@@ -81,14 +82,14 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const { data, isLoading, error } = useQuery({
     queryKey: ["sites", userId, searchTerm],
     queryFn: () => fetchMonitors(searchTerm),
-    refetchInterval: 1000,
+    refetchInterval: 100000,
     retry: false,
     enabled: !!userId,
   });
   const { data: status } = useQuery({
     queryKey: ["status"],
     queryFn: fetchStatus,
-    refetchInterval: 1000,
+    refetchInterval: 100000,
     retry: false,
   });
   useEffect(() => {
@@ -139,6 +140,29 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       toast.error(error.message || "Failed to update monitor");
     },
   });
+  const bulkDeleteMonitors = useMutation({
+    mutationFn: async (ids: string[]) => {
+      if (ids.length === 0) {
+        throw new Error("No monitors selected for deletion.");
+      }
+      const response = await fetch(`/api/monitor/bulk-delete?ids=${ids}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) throw new Error("Failed to delete monitors");
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sites"] });
+      toast.success("Monitors deleted successfully");
+      setSelectedMonitors([]);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete monitors");
+    },
+  });
 
   if (error) return <div>{error.message}</div>;
   return (
@@ -146,9 +170,20 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
         <div className="flex items-center gap-2">
           <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
-            <input type="checkbox" id="bulk" />
+            <input
+              type="checkbox"
+              id="bulk"
+              checked={selectedMonitors.length === data?.length}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setSelectedMonitors(data?.map((monitor) => monitor.id) || []);
+                } else {
+                  setSelectedMonitors([]);
+                }
+              }}
+            />
             <label className="tracking-[4px]" htmlFor="bulk">
-              0/{data && data.length}
+              {selectedMonitors.length}/{data && data.length}
             </label>
           </div>
           <div className="relative">
@@ -160,10 +195,14 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
             </button>
             {openBulk && (
               <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden">
-                <div className="manrope text-gray-400 bg-[#000d07] w-full p-2">
+                <div className="manrope text-gray-400 bg-[#000d07] w-full p-2 border-b border-white/20">
                   <h1>Monitor Actions</h1>
                 </div>
-                <button className="hover:bg-[#000d07] cursor-pointer w-full p-2 flex items-center gap-2">
+                <button
+                  disabled={selectedMonitors.length === 0}
+                  onClick={() => bulkDeleteMonitors.mutate(selectedMonitors)}
+                  className="hover:bg-[#000d07] disabled:bg-gray-800 disabled:cursor-not-allowed cursor-pointer w-full p-2 flex items-center gap-2"
+                >
                   <FaTrash className="text-xs" /> Delete
                 </button>
               </div>
@@ -288,6 +327,24 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               ) : (
                 <div className="bg-green-950/90 py-3 px-4 rounded-lg border border-white/20 flex items-center justify-between mb-2">
                   <div className="flex items-center gap-4">
+                    <div>
+                      <input
+                        type="checkbox"
+                        checked={selectedMonitors.includes(monitor.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedMonitors((prev) => [
+                              ...prev,
+                              monitor.id,
+                            ]);
+                          } else {
+                            setSelectedMonitors((prev) =>
+                              prev.filter((id) => id !== monitor.id)
+                            );
+                          }
+                        }}
+                      />
+                    </div>
                     <span className="relative flex h-3 w-3">
                       <span
                         className={`animate-ping absolute inline-flex h-full w-full rounded-full ${
