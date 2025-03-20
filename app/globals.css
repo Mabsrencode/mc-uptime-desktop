@@ -10,7 +10,7 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: "Roboto", sans-serif;
-  /* user-select: none; */
+  user-select: none;
 }
 
 .manrope {

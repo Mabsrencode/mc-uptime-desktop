@@ -167,77 +167,83 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   if (error) return <div>{error.message}</div>;
   return (
     <div className="text-white w-full mt-6">
-      <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
-        <div className="flex items-center gap-2">
-          <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
-            <input
-              type="checkbox"
-              id="bulk"
-              checked={selectedMonitors.length === data?.length}
-              onChange={(e) => {
-                if (e.target.checked) {
-                  setSelectedMonitors(data?.map((monitor) => monitor.id) || []);
-                } else {
-                  setSelectedMonitors([]);
-                }
-              }}
-            />
-            <label className="tracking-[4px]" htmlFor="bulk">
-              {selectedMonitors.length}/{data && data.length}
-            </label>
-          </div>
-          <div className="relative">
-            <button
-              onClick={() => setOpenBulk(!openBulk)}
-              className=" border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center text-gray-400"
-            >
-              Bulk action <IoIosArrowDown />
-            </button>
-            {openBulk && (
-              <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden z-[500]">
-                <div className="manrope text-gray-400 bg-[#000d07] w-full p-2 border-b border-white/20">
-                  <h1>Monitor Actions</h1>
+      //!fix
+      {data && data.length > 0 && (
+        <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
+          <div className="flex items-center gap-2">
+            <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
+              <input
+                type="checkbox"
+                id="bulk"
+                checked={selectedMonitors.length === data?.length}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedMonitors(
+                      data?.map((monitor) => monitor.id) || []
+                    );
+                  } else {
+                    setSelectedMonitors([]);
+                  }
+                }}
+                className={`cursor-pointer`}
+              />
+              <label className="tracking-[4px]" htmlFor="bulk">
+                {selectedMonitors.length}/{data && data.length}
+              </label>
+            </div>
+            <div className="relative">
+              <button
+                onClick={() => setOpenBulk(!openBulk)}
+                className=" border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center text-gray-400"
+              >
+                Bulk action <IoIosArrowDown />
+              </button>
+              {openBulk && (
+                <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden z-[500]">
+                  <div className="manrope text-gray-400 bg-[#000d07] w-full p-2 border-b border-white/20">
+                    <h1>Monitor Actions</h1>
+                  </div>
+                  <button
+                    disabled={selectedMonitors.length === 0}
+                    onClick={() => bulkDeleteMonitors.mutate(selectedMonitors)}
+                    className="hover:bg-[#000d07] disabled:bg-gray-800 disabled:cursor-not-allowed cursor-pointer w-full p-2 flex items-center gap-2"
+                  >
+                    <FaTrash className="text-xs" /> Delete
+                  </button>
                 </div>
-                <button
-                  disabled={selectedMonitors.length === 0}
-                  onClick={() => bulkDeleteMonitors.mutate(selectedMonitors)}
-                  className="hover:bg-[#000d07] disabled:bg-gray-800 disabled:cursor-not-allowed cursor-pointer w-full p-2 flex items-center gap-2"
-                >
-                  <FaTrash className="text-xs" /> Delete
-                </button>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
+          <div className="flex items-center">
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              type="text"
+              placeholder="Search by name or URL"
+              className="border border-white/20 outline-none px-2 py-1 rounded"
+            />
+            <select className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
+              <option value="HTTP" className="bg-green-950">
+                HTTP
+              </option>
+              <option value="Ping" className="bg-green-950">
+                Ping
+              </option>
+              <option value="Port" className="bg-green-950">
+                Port
+              </option>
+              <option value="IP Address" className="bg-green-950">
+                IP Address
+              </option>
+            </select>
+            <div className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
+              <span className="flex items-center gap-2">
+                <GoFilter className="inline" /> Filter
+              </span>
+            </div>
           </div>
         </div>
-        <div className="flex items-center">
-          <input
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            type="text"
-            placeholder="Search by name or URL"
-            className="border border-white/20 outline-none px-2 py-1 rounded"
-          />
-          <select className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
-            <option value="HTTP" className="bg-green-950">
-              HTTP
-            </option>
-            <option value="Ping" className="bg-green-950">
-              Ping
-            </option>
-            <option value="Port" className="bg-green-950">
-              Port
-            </option>
-            <option value="IP Address" className="bg-green-950">
-              IP Address
-            </option>
-          </select>
-          <div className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
-            <span className="flex items-center gap-2">
-              <GoFilter className="inline" /> Filter
-            </span>
-          </div>
-        </div>
-      </div>
+      )}
       {isLoading ? (
         <div className="flex flex-col gap-2 mt-6">
           {Array.from({ length: 4 }).map((_, index) => (
@@ -325,10 +331,11 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                   onCancel={() => setEditingMonitor(null)}
                 />
               ) : (
-                <div className="bg-green-950/90 py-3 px-4 rounded-lg border border-white/20 flex items-center justify-between mb-2">
+                <div className="incident_container bg-green-950/90 py-3 px-4 rounded-lg border border-white/20 flex items-center justify-between mb-2">
                   <div className="flex items-center gap-4">
                     <div>
                       <input
+                        className={`incident_checkbox`}
                         type="checkbox"
                         checked={selectedMonitors.includes(monitor.id)}
                         onChange={(e) => {

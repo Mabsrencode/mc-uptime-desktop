@@ -1,3 +1,14 @@
 input[checkbox] {
   background-color: green !important;
 }
+.incident_checkbox {
+  display: none;
+  height: 16px;
+  width: 16px;
+}
+.incident_container:hover .incident_checkbox {
+  display: block;
+}
+.incident_checkbox:checked {
+  display: block !important;
+}

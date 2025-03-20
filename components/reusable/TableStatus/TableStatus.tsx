@@ -6,21 +6,6 @@ import {
 } from "date-fns";
 import React from "react";
 
-interface IncidentLogsData {
-  id: string;
-  siteId: string;
-  startTime: string;
-  endTime: string | null;
-  resolved: boolean;
-  error?: string | null;
-  details?: string | null;
-  url: string;
-  email: string;
-  monitorType: string;
-  interval: number;
-  up: boolean;
-}
-
 interface IncidentData {
   data: { data: IncidentLogsData[] | null };
   handleNavigateIncident: (id: string) => void;

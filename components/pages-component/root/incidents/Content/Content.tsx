@@ -9,23 +9,9 @@ import { GoFilter } from "react-icons/go";
 import { IoIosArrowDown } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import Link from "next/link";
-interface Incident {
-  id: string;
-  siteId: string;
-  startTime: string;
-  endTime: string | null;
-  resolved: boolean;
-  error?: string | null;
-  details?: string | null;
-  url: string;
-  email: string;
-  monitorType: string;
-  interval: number;
-  up: boolean;
-}
 
 interface GetIncidentsByUserResponse {
-  data: Incident[] | null;
+  data: IncidentLogsData[] | null;
 }
 const Content = () => {
   const [openBulk, setOpenBulk] = useState<boolean>(false);
