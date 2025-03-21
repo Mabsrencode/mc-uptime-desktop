@@ -1,14 +1,41 @@
-input[checkbox] {
-  background-color: green !important;
-}
 .incident_checkbox {
   display: none;
   height: 16px;
   width: 16px;
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
 }
+
 .incident_container:hover .incident_checkbox {
   display: block;
 }
+
 .incident_checkbox:checked {
-  display: block !important;
+  display: block;
+}
+.incident_checkbox:checked ~ .incident_item {
+  padding-left: 48px;
+}
+
+.incident_checkbox:hover ~ .incident_item {
+  padding-left: 48px;
+}
+.incident_tag {
+  position: absolute;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+.three_dots {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+}
+.incident_tag:hover + .incident_checkbox {
+  display: none !important;
 }

@@ -14,6 +14,7 @@ import { MdError } from "react-icons/md";
 import Link from "next/link";
 import MonitorForm from "@/components/reusable/MonitorForm/MonitorForm";
 import { useStatusStore } from "@/stores/useStatusStore";
+import { useRouter } from "next/navigation";
 interface Checks {
   up: boolean;
 }
@@ -52,6 +53,7 @@ export interface SiteStatusData {
 const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   handleShowForm,
 }) => {
+  const router = useRouter();
   const { data: authData } = useAuthStore();
   const { setStatus } = useStatusStore();
   const userId = authData?.user?.userID;
@@ -82,14 +84,14 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const { data, isLoading, error } = useQuery({
     queryKey: ["sites", userId, searchTerm],
     queryFn: () => fetchMonitors(searchTerm),
-    refetchInterval: 100000,
+    refetchInterval: 1000,
     retry: false,
     enabled: !!userId,
   });
   const { data: status } = useQuery({
     queryKey: ["status"],
     queryFn: fetchStatus,
-    refetchInterval: 100000,
+    refetchInterval: 1000,
     retry: false,
   });
   useEffect(() => {
@@ -167,8 +169,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   if (error) return <div>{error.message}</div>;
   return (
     <div className="text-white w-full mt-6">
-      //!fix
-      {data && data.length > 0 && (
+      {(data && data.length > 0) || searchTerm ? (
         <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
           <div className="flex items-center gap-2">
             <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
@@ -226,14 +227,14 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               <option value="HTTP" className="bg-green-950">
                 HTTP
               </option>
-              <option value="Ping" className="bg-green-950">
+              <option value="ping" className="bg-green-950">
                 Ping
               </option>
-              <option value="Port" className="bg-green-950">
+              <option value="port" className="bg-green-950">
                 Port
               </option>
-              <option value="IP Address" className="bg-green-950">
-                IP Address
+              <option value="keyword" className="bg-green-950">
+                Keyword
               </option>
             </select>
             <div className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
@@ -243,7 +244,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
             </div>
           </div>
         </div>
-      )}
+      ) : null}
       {isLoading ? (
         <div className="flex flex-col gap-2 mt-6">
           {Array.from({ length: 4 }).map((_, index) => (
@@ -331,73 +332,20 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                   onCancel={() => setEditingMonitor(null)}
                 />
               ) : (
-                <div className="incident_container bg-green-950/90 py-3 px-4 rounded-lg border border-white/20 flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <input
-                        className={`incident_checkbox`}
-                        type="checkbox"
-                        checked={selectedMonitors.includes(monitor.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedMonitors((prev) => [
-                              ...prev,
-                              monitor.id,
-                            ]);
-                          } else {
-                            setSelectedMonitors((prev) =>
-                              prev.filter((id) => id !== monitor.id)
-                            );
-                          }
-                        }}
-                      />
-                    </div>
-                    <span className="relative flex h-3 w-3">
-                      <span
-                        className={`animate-ping absolute inline-flex h-full w-full rounded-full ${
-                          st?.up ? "bg-white" : "bg-red-500"
-                        }  opacity-75`}
-                      ></span>
-                      <span
-                        className={`relative inline-flex rounded-full h-3 w-3 ${
-                          st?.up ? "bg-green-500" : "bg-red-500/80"
-                        }`}
-                      ></span>
-                    </span>
-                    <div>
-                      <Link
-                        href={`/monitors/${monitor.id}`}
-                        className="text-sm font-semibold hover:underline"
-                      >
-                        {monitor.url}
-                      </Link>
-
-                      <div className="text-gray-400 text-xs mt-1 flex gap-1 items-center">
-                        <p className="border border-white/20 inline py-[2px] px-[3px] rounded bg-black/40">
-                          {monitor.monitorType}
-                        </p>
-                        {st?.checkedAt ? (
-                          <TimeDelta dt={st?.checkedAt} />
-                        ) : (
-                          <span className="h-[10px] w-[100px] bg-gray-500 animate-pulse rounded-full"></span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="relative flex items-center">
+                <div className="incident_container relative">
+                  <div className="relative incident_tag flex items-center">
                     {st?.error && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 w-[200px] xl:w-full">
                         <div>
                           <Link
-                            className="text-xs text-nowrap bg-black/40 hover:bg-black/60 transition-all rounded py-1 px-2"
+                            className="text-xs text-nowrap bg-black/40 hover:bg-black/70 transition-all rounded py-1 px-2"
                             href={`/incidents/${reverseIncidentData[0].id}`}
                           >
                             View Incident
                           </Link>
                         </div>
-                        <div className="flex gap-1">
-                          <MdError className="text-red-700" />
+                        <div className="flex items-center gap-1">
+                          <MdError className="text-red-700 text-4xl xl:text-base" />
                           <p className="text-xs text-gray-400">{st?.error}</p>
                         </div>
                       </div>
@@ -409,16 +357,66 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                         <span> {monitor.interval >= 60 ? "hour" : "min"}</span>
                       </p>
                     </div>
+                  </div>
+                  <input
+                    className="incident_checkbox absolute z-[1000]"
+                    type="checkbox"
+                    checked={selectedMonitors.includes(monitor.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedMonitors((prev) => [...prev, monitor.id]);
+                      } else {
+                        setSelectedMonitors((prev) =>
+                          prev.filter((id) => id !== monitor.id)
+                        );
+                      }
+                    }}
+                  />
+                  <div
+                    onClick={() => router.push(`/monitors/${monitor.id}`)}
+                    className="relative cursor-pointer incident_item bg-green-950/90 py-3 hover:pl-12 px-4 rounded-lg border border-white/20 flex items-center justify-between mb-2 transition-all hover:bg-black/10"
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="relative flex h-3 w-3">
+                        <span
+                          className={`animate-ping absolute inline-flex h-full w-full rounded-full ${
+                            st?.up ? "bg-white" : "bg-red-500"
+                          }  opacity-75`}
+                        ></span>
+                        <span
+                          className={`relative inline-flex rounded-full h-3 w-3 ${
+                            st?.up ? "bg-green-500" : "bg-red-500/80"
+                          }`}
+                        ></span>
+                      </span>
+                      <div className="max-w-[400px]">
+                        <h1 className="text-sm font-semibold text-ellipsis">
+                          {monitor.url}
+                        </h1>
+                        <div className="text-gray-400 text-xs mt-1 flex gap-1 items-center">
+                          <p className="border border-white/20 inline py-[2px] px-[3px] rounded bg-black/40">
+                            {monitor.monitorType}
+                          </p>
+                          {st?.checkedAt ? (
+                            <TimeDelta dt={st?.checkedAt} />
+                          ) : (
+                            <span className="h-[10px] w-[100px] bg-gray-500 animate-pulse rounded-full"></span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="three_dots">
                     <BsThreeDots
                       onClick={() =>
                         setOpenDropdownId((prev) =>
                           prev === monitor.id ? null : monitor.id
                         )
                       }
-                      className="hover:bg-white/20 rounded-full cursor-pointer p-1 text-2xl"
+                      className="hover:bg-white/20 rounded-full cursor-pointer p-1 text-2xl z-0"
                     />
                     {openDropdownId === monitor.id && (
-                      <div className="absolute top-8 -right-12 z-10 bg-white text-black shadow-lg rounded-md p-2">
+                      <div className="absolute top-8 -right-12 bg-white text-black shadow-lg rounded-md p-2">
                         <button
                           onClick={() => setEditingMonitor(monitor)}
                           className="block w-full text-left px-2 py-1 hover:bg-gray-200 cursor-pointer"
