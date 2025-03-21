@@ -62,13 +62,16 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const [editingMonitor, setEditingMonitor] = useState<Monitor | null>(null);
   const [openBulk, setOpenBulk] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
+  const [monitorTypesFilter, setMonitorTypesFilter] = useState<string>();
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedMonitors, setSelectedMonitors] = useState<string[]>([]);
-
-  const fetchMonitors = async (searchTerm: string = ""): Promise<Monitor[]> => {
+  const fetchMonitors = async (
+    searchTerm: string = "",
+    type: string = ""
+  ): Promise<Monitor[]> => {
     if (!userId) return [];
     const response = await fetch(
-      `/api/monitor?userId=${userId}&search=${searchTerm}`
+      `/api/monitor?userId=${userId}&search=${searchTerm}&type=${type}`
     );
     if (!response.ok) throw new Error("Failed to fetch monitors");
     return (await response.json()).data;
@@ -82,8 +85,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   };
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["sites", userId, searchTerm],
-    queryFn: () => fetchMonitors(searchTerm),
+    queryKey: ["sites", userId, searchTerm, monitorTypesFilter],
+    queryFn: () => fetchMonitors(searchTerm, monitorTypesFilter),
     refetchInterval: 1000,
     retry: false,
     enabled: !!userId,
@@ -169,7 +172,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   if (error) return <div>{error.message}</div>;
   return (
     <div className="text-white w-full mt-6">
-      {(data && data.length > 0) || searchTerm ? (
+      {(data && data.length > 0) || searchTerm || monitorTypesFilter ? (
         <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
           <div className="flex items-center gap-2">
             <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
@@ -223,7 +226,14 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               placeholder="Search by name or URL"
               className="border border-white/20 outline-none px-2 py-1 rounded"
             />
-            <select className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
+            <select
+              value={monitorTypesFilter}
+              onChange={(e) => setMonitorTypesFilter(e.target.value)}
+              className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded"
+            >
+              <option value="" className="bg-green-950">
+                All
+              </option>
               <option value="HTTP" className="bg-green-950">
                 HTTP
               </option>
@@ -262,7 +272,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       ) : error ? (
         <div>{(error as any).message}</div>
       ) : data && data.length === 0 ? (
-        data && data.length === 0 && searchTerm ? (
+        (data && data.length === 0 && searchTerm) ||
+        (data && data.length === 0 && monitorTypesFilter) ? (
           <div className="mt-24 mx-auto w-[400px]">
             <h4 className="manrope text-center text-xl manrope font-bold">
               🤐 No <span className="text-green-500">results</span> match your
@@ -274,7 +285,10 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               get some results.
             </p>
             <button
-              onClick={() => setSearchTerm("")}
+              onClick={() => {
+                setSearchTerm("");
+                setMonitorTypesFilter("");
+              }}
               className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white flex items-center gap-1 mx-auto mt-4"
             >
               Clear all filters and search

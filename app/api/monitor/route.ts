@@ -51,6 +51,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
     const search = searchParams.get("search");
+    const type = searchParams.get("type");
 
     if (!userId) {
       return NextResponse.json(
@@ -62,8 +63,10 @@ export async function GET(req: Request) {
     const url = search
       ? `${
           environments.API_URL
-        }/user-sites/${userId}?search=${encodeURIComponent(search)}`
-      : `${environments.API_URL}/user-sites/${userId}`;
+        }/user-sites/${userId}?search=${encodeURIComponent(
+          search
+        )}&type=${type}`
+      : `${environments.API_URL}/user-sites/${userId}?search=${search}&type=${type}`;
 
     const response = await fetch(url, {
       method: "GET",
