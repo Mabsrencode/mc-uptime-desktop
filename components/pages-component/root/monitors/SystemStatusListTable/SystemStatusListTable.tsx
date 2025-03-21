@@ -15,6 +15,7 @@ import Link from "next/link";
 import MonitorForm from "@/components/reusable/MonitorForm/MonitorForm";
 import { useStatusStore } from "@/stores/useStatusStore";
 import { useRouter } from "next/navigation";
+import filterData from "./filterData";
 interface Checks {
   up: boolean;
 }
@@ -63,15 +64,21 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const [openBulk, setOpenBulk] = useState<boolean>(false);
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [monitorTypesFilter, setMonitorTypesFilter] = useState<string>();
+  const [statusFilter, setStatusFilter] = useState<"up" | "down" | null>(null);
+
+  const handleStatusFilterChange = (status: "up" | "down") => {
+    setStatusFilter((prev) => (prev === status ? null : status));
+  };
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedMonitors, setSelectedMonitors] = useState<string[]>([]);
   const fetchMonitors = async (
     searchTerm: string = "",
-    type: string = ""
+    type: string = "",
+    status: "up" | "down" | null = null
   ): Promise<Monitor[]> => {
     if (!userId) return [];
     const response = await fetch(
-      `/api/monitor?userId=${userId}&search=${searchTerm}&type=${type}`
+      `/api/monitor?userId=${userId}&search=${searchTerm}&type=${type}&status=${status}`
     );
     if (!response.ok) throw new Error("Failed to fetch monitors");
     return (await response.json()).data;
@@ -85,8 +92,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   };
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["sites", userId, searchTerm, monitorTypesFilter],
-    queryFn: () => fetchMonitors(searchTerm, monitorTypesFilter),
+    queryKey: ["sites", userId, searchTerm, monitorTypesFilter, statusFilter],
+    queryFn: () => fetchMonitors(searchTerm, monitorTypesFilter, statusFilter),
     refetchInterval: 1000,
     retry: false,
     enabled: !!userId,
@@ -172,7 +179,10 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   if (error) return <div>{error.message}</div>;
   return (
     <div className="text-white w-full mt-6">
-      {(data && data.length > 0) || searchTerm || monitorTypesFilter ? (
+      {(data && data.length > 0) ||
+      searchTerm ||
+      monitorTypesFilter ||
+      statusFilter ? (
         <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
           <div className="flex items-center gap-2">
             <div className="border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center">
@@ -197,7 +207,10 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
             </div>
             <div className="relative">
               <button
-                onClick={() => setOpenBulk(!openBulk)}
+                onClick={() => {
+                  setOpenBulk(!openBulk);
+                  setOpenFilter(false);
+                }}
                 className=" border border-white/20 outline-none px-2 py-1 rounded flex gap-2 items-center text-gray-400"
               >
                 Bulk action <IoIosArrowDown />
@@ -227,6 +240,10 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               className="border border-white/20 outline-none px-2 py-1 rounded"
             />
             <select
+              onClick={() => {
+                setOpenFilter(false);
+                setOpenBulk(false);
+              }}
               value={monitorTypesFilter}
               onChange={(e) => setMonitorTypesFilter(e.target.value)}
               className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded"
@@ -247,10 +264,51 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                 Keyword
               </option>
             </select>
-            <div className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
-              <span className="flex items-center gap-2">
+            <div className="relative border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded">
+              <span
+                onClick={() => {
+                  setOpenFilter(!openFilter);
+                  setOpenBulk(false);
+                }}
+                className="flex items-center gap-2 cursor-pointer"
+              >
                 <GoFilter className="inline" /> Filter
               </span>
+              {openFilter && (
+                <div className="absolute top-7 left-0 overflow-hidden w-[200px] z-[500] border-b border-x border-white/20 rounded">
+                  {filterData.map((e) => (
+                    <div
+                      key={e.label}
+                      className="flex items-center gap-2 bg-green-950  p-2 border-t border-white/20 hover:bg-[#000d07] cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        onChange={() =>
+                          handleStatusFilterChange(e.value as "up" | "down")
+                        }
+                        id={e.label}
+                        value={e.value}
+                      />
+                      <label
+                        className="block cursor-pointer w-full"
+                        htmlFor={e.label}
+                      >
+                        {e.label}
+                      </label>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setSearchTerm("");
+                      setMonitorTypesFilter("");
+                      setStatusFilter(null);
+                    }}
+                    className="flex items-center gap-2 justify-center bg-green-950  p-2 border-t border-white/20 hover:bg-[#000d07] cursor-pointer w-full"
+                  >
+                    <FaTrash className="text-xs" /> Clear all filters
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -273,7 +331,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         <div>{(error as any).message}</div>
       ) : data && data.length === 0 ? (
         (data && data.length === 0 && searchTerm) ||
-        (data && data.length === 0 && monitorTypesFilter) ? (
+        (data && data.length === 0 && monitorTypesFilter) ||
+        (data && data.length === 0 && statusFilter) ? (
           <div className="mt-24 mx-auto w-[400px]">
             <h4 className="manrope text-center text-xl manrope font-bold">
               🤐 No <span className="text-green-500">results</span> match your
