@@ -16,6 +16,7 @@ import MonitorForm from "@/components/reusable/MonitorForm/MonitorForm";
 import { useStatusStore } from "@/stores/useStatusStore";
 import { useRouter } from "next/navigation";
 import filterData from "./filterData";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 interface Checks {
   up: boolean;
 }
@@ -94,14 +95,14 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const { data, isLoading, error } = useQuery({
     queryKey: ["sites", userId, searchTerm, monitorTypesFilter, statusFilter],
     queryFn: () => fetchMonitors(searchTerm, monitorTypesFilter, statusFilter),
-    refetchInterval: 1000,
+    refetchInterval: 60000,
     retry: false,
     enabled: !!userId,
   });
   const { data: status } = useQuery({
-    queryKey: ["status"],
+    queryKey: ["status", selectedMonitors],
     queryFn: fetchStatus,
-    refetchInterval: 1000,
+    refetchInterval: 60000,
     retry: false,
   });
   useEffect(() => {
@@ -201,8 +202,16 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                 }}
                 className={`cursor-pointer`}
               />
-              <label className="tracking-[4px]" htmlFor="bulk">
-                {selectedMonitors.length}/{data && data.length}
+              <label
+                className="tracking-[4px] flex items-center"
+                htmlFor="bulk"
+              >
+                {selectedMonitors.length}/
+                {data && data.length ? (
+                  data.length
+                ) : (
+                  <AiOutlineLoading3Quarters className="animate-spin font-bold duration-150" />
+                )}
               </label>
             </div>
             <div className="relative">
