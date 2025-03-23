@@ -100,7 +100,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     enabled: !!userId,
   });
   const { data: status } = useQuery({
-    queryKey: ["status", selectedMonitors],
+    queryKey: ["status"],
     queryFn: fetchStatus,
     refetchInterval: 60000,
     retry: false,
@@ -297,6 +297,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                         }
                         id={e.label}
                         value={e.value}
+                        checked={statusFilter === e.value}
                       />
                       <label
                         className="block cursor-pointer w-full"
@@ -419,16 +420,24 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                     {st?.error && (
                       <div className="flex items-center gap-1 w-[200px] xl:w-full">
                         <div>
-                          <Link
-                            className="text-xs text-nowrap bg-black/40 hover:bg-black/70 transition-all rounded py-1 px-2"
-                            href={`/incidents/${reverseIncidentData[0].id}`}
-                          >
-                            View Incident
-                          </Link>
+                          {reverseIncidentData &&
+                          reverseIncidentData[0] &&
+                          reverseIncidentData[0].id ? (
+                            <Link
+                              className="text-xs text-nowrap bg-black/40 hover:bg-black/70 transition-all rounded py-1 px-2"
+                              href={`/incidents/${reverseIncidentData[0].id}`}
+                            >
+                              View Incident
+                            </Link>
+                          ) : (
+                            <span className="h-[10px] w-[100px] bg-gray-500 animate-pulse rounded-full"></span>
+                          )}
                         </div>
                         <div className="flex items-center gap-1">
-                          <MdError className="text-red-700 text-4xl xl:text-base" />
-                          <p className="text-xs text-gray-400">{st?.error}</p>
+                          <MdError className="text-red-700 min-w-[20px]" />
+                          <p className="text-xs text-gray-400 capitalize">
+                            {st?.error}
+                          </p>
                         </div>
                       </div>
                     )}

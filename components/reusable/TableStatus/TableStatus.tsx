@@ -96,7 +96,7 @@ const TableStatus: React.FC<IncidentData> = ({
                       </td>
                     )}
                     <td className="text-center px-6 py-4 max-w-[200px] whitespace-nowrap overflow-hidden text-ellipsis">
-                      <span className="bg-red-500/50 text-white px-2 py-1 rounded-md text-xs truncate block">
+                      <span className="bg-red-500/50 capitalize text-white px-2 py-1 rounded-md text-xs truncate block">
                         {log.error}
                       </span>
                     </td>
