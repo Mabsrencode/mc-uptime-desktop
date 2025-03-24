@@ -66,12 +66,12 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [monitorTypesFilter, setMonitorTypesFilter] = useState<string>();
   const [statusFilter, setStatusFilter] = useState<"up" | "down" | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedMonitors, setSelectedMonitors] = useState<string[]>([]);
 
   const handleStatusFilterChange = (status: "up" | "down") => {
     setStatusFilter((prev) => (prev === status ? null : status));
   };
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedMonitors, setSelectedMonitors] = useState<string[]>([]);
   const fetchMonitors = async (
     searchTerm: string = "",
     type: string = "",
@@ -171,6 +171,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       queryClient.invalidateQueries({ queryKey: ["sites"] });
       toast.success("Monitors deleted successfully");
       setSelectedMonitors([]);
+      setOpenBulk(false);
     },
     onError: (error) => {
       toast.error(error.message || "Failed to delete monitors");
