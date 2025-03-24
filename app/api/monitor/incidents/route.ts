@@ -15,24 +15,22 @@ export async function GET(req: Request) {
     const search = searchParams.get("search");
     const type = searchParams.get("type");
     const status = searchParams.get("status");
-    const paginate = searchParams.get("paginate");
+    const page = searchParams.get("page") || "1";
+    const perPage = searchParams.get("perPage") || "5";
+
     if (!userId) {
       return NextResponse.json(
         { message: "Incident ID is required" },
         { status: 400 }
       );
     }
-    const url = search
-      ? `${
-          environments.API_URL
-        }/incidents/${userId}?search=${encodeURIComponent(
-          search
-        )}&type=${type}&status=${status}`
-      : `${
-          environments.API_URL
-        }/incidents/${userId}?search=${search}&type=${type}&status=${status}&paginate=${
-          paginate ?? 5
-        }`;
+
+    const url = `${
+      environments.API_URL
+    }/incidents/${userId}?search=${encodeURIComponent(
+      search || ""
+    )}&type=${type}&status=${status}&page=${page}&perPage=${perPage}`;
+
     const response = await fetch(url, {
       method: "GET",
       headers: {

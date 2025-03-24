@@ -10,34 +10,45 @@ import { IoIosArrowDown } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import Link from "next/link";
 import filterData from "../../monitors/SystemStatusListTable/filterData";
+import Pagination from "@/components/reusable/Pagination/Pagination";
 
 interface GetIncidentsByUserResponse {
   data: IncidentLogsData[] | null;
+  total: number;
 }
+
 const Content = () => {
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [monitorTypesFilter, setMonitorTypesFilter] = useState<string>();
   const [statusFilter, setStatusFilter] = useState<"up" | "down" | null>(null);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(5);
+
   const handleStatusFilterChange = (status: "up" | "down") => {
     setStatusFilter((prev) => (prev === status ? null : status));
+    setCurrentPage(1);
   };
+
   const { data: user } = useAuthStore();
   const router = useRouter();
   const handleNavigateIncident = (id: string) => {
     router.push(`/incidents/${id}`);
   };
   const userId = user && user.user && user.user.userID;
+
   const handleGetAllIncidents = async (
     searchTerm: string = "",
     type: string = "",
-    status: "up" | "down" | null = null
+    status: "up" | "down" | null = null,
+    page: number = 1,
+    perPage: number = postsPerPage
   ) => {
     const response =
       userId &&
       (await fetch(
-        `/api/monitor/incidents?userId=${userId}&search=${searchTerm}&type=${type}&status=${status}`
+        `/api/monitor/incidents?userId=${userId}&search=${searchTerm}&type=${type}&status=${status}&page=${page}&perPage=${perPage}`
       ));
     if (!response) throw new Error("Something went wrong from the server.");
     if (!response.ok) throw new Error("Failed to fetch incidents");
@@ -53,12 +64,36 @@ const Content = () => {
         searchTerm,
         monitorTypesFilter,
         statusFilter,
+        currentPage,
+        postsPerPage,
       ],
       queryFn: () =>
-        handleGetAllIncidents(searchTerm, monitorTypesFilter, statusFilter),
+        handleGetAllIncidents(
+          searchTerm,
+          monitorTypesFilter,
+          statusFilter,
+          currentPage,
+          postsPerPage
+        ),
       staleTime: 10 * 60 * 1000,
       retry: false,
     });
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const nextPage = () => {
+    if (
+      data &&
+      data.total &&
+      currentPage < Math.ceil(data.total / postsPerPage)
+    ) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  const previousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   if (isLoading && !searchTerm && !monitorTypesFilter && !statusFilter)
     return <UptimeLoading />;
   if (error)
@@ -67,7 +102,7 @@ const Content = () => {
         <p>Something went wrong: {error.message}</p>
       </div>
     );
-  console.log(data);
+
   return (
     <section className="text-white w-full px-4 container mx-auto">
       <div className="mt-6 flex w-full justify-between mb-6">
@@ -85,7 +120,10 @@ const Content = () => {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
                 placeholder="Search by name or URL"
                 className="border border-white/20 outline-none px-2 py-1 rounded"
               />
@@ -94,7 +132,10 @@ const Content = () => {
                   setOpenFilter(false);
                 }}
                 value={monitorTypesFilter}
-                onChange={(e) => setMonitorTypesFilter(e.target.value)}
+                onChange={(e) => {
+                  setMonitorTypesFilter(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="border border-white/20 text-gray-400 outline-none px-2 py-1 ml-2 rounded"
               >
                 <option value="HTTP" className="bg-green-950">
@@ -126,9 +167,10 @@ const Content = () => {
                       >
                         <input
                           type="checkbox"
-                          onChange={() =>
-                            handleStatusFilterChange(e.value as "up" | "down")
-                          }
+                          onChange={() => {
+                            handleStatusFilterChange(e.value as "up" | "down");
+                            setCurrentPage(1);
+                          }}
                           id={e.label}
                           value={e.value}
                           checked={statusFilter === e.value}
@@ -146,6 +188,7 @@ const Content = () => {
                         setSearchTerm("");
                         setMonitorTypesFilter("");
                         setStatusFilter(null);
+                        setCurrentPage(1);
                       }}
                       className="flex items-center gap-2 justify-center bg-green-950  p-2 border-t border-white/20 hover:bg-[#000d07] cursor-pointer w-full"
                     >
@@ -192,6 +235,7 @@ const Content = () => {
               onClick={() => {
                 setSearchTerm("");
                 setMonitorTypesFilter("");
+                setCurrentPage(1);
               }}
               className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white flex items-center gap-1 mx-auto mt-4"
             >
@@ -222,13 +266,25 @@ const Content = () => {
         )
       ) : (
         data && (
-          <TableStatus
-            bgColored
-            data={data}
-            bordered
-            showUrl
-            handleNavigateIncident={handleNavigateIncident}
-          />
+          <>
+            <TableStatus
+              bgColored
+              data={data}
+              bordered
+              showUrl
+              handleNavigateIncident={handleNavigateIncident}
+            />
+            {data.total > postsPerPage && (
+              <Pagination
+                postsPerPage={postsPerPage}
+                totalPosts={data.total}
+                paginate={paginate}
+                previousPage={previousPage}
+                nextPage={nextPage}
+                currentPage={currentPage}
+              />
+            )}
+          </>
         )
       )}
     </section>
