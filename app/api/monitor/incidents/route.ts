@@ -15,6 +15,7 @@ export async function GET(req: Request) {
     const search = searchParams.get("search");
     const type = searchParams.get("type");
     const status = searchParams.get("status");
+    const paginate = searchParams.get("paginate");
     if (!userId) {
       return NextResponse.json(
         { message: "Incident ID is required" },
@@ -27,7 +28,11 @@ export async function GET(req: Request) {
         }/incidents/${userId}?search=${encodeURIComponent(
           search
         )}&type=${type}&status=${status}`
-      : `${environments.API_URL}/incidents/${userId}?search=${search}&type=${type}&status=${status}`;
+      : `${
+          environments.API_URL
+        }/incidents/${userId}?search=${search}&type=${type}&status=${status}&paginate=${
+          paginate ?? 5
+        }`;
     const response = await fetch(url, {
       method: "GET",
       headers: {
