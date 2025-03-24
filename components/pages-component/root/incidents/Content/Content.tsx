@@ -24,7 +24,7 @@ const Content = () => {
   const [statusFilter, setStatusFilter] = useState<"up" | "down" | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(5);
+  const [postsPerPage] = useState(10);
 
   const handleStatusFilterChange = (status: "up" | "down") => {
     setStatusFilter((prev) => (prev === status ? null : status));

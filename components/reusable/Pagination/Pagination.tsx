@@ -26,7 +26,7 @@ const Pagination: React.FC<{
   );
 
   return (
-    <div className="my-16">
+    <div className="mb-8 mt-2">
       <ul className="flex justify-end items-center w-full mx-auto">
         <li
           onClick={previousPage}
@@ -38,20 +38,22 @@ const Pagination: React.FC<{
           <>
             <li
               onClick={() => paginate(1)}
-              className={`border text-xs border-white/20 p-2 h-[30px] text-white ${
+              className={`border text-xs flex items-center justify-center border-white/20 p-2 h-[30px] text-white ${
                 currentPage === 1 && "bg-green-500"
               }`}
             >
               1
             </li>
-            <li className="p-2 h-[30px] border border-white/20 text-xs">...</li>
+            <li className="p-2 h-[30px] border border-white/20 text-xs flex items-center justify-center">
+              ...
+            </li>
           </>
         )}
         {visiblePages.map((number) => (
           <li
             key={number}
             onClick={() => paginate(number)}
-            className={`border border-white/20 p-2 text-xs h-[30px] flex items-center justify-center text-white ${
+            className={`border text-xs flex items-center justify-center border-white/20 p-2 h-[30px] text-white  ${
               currentPage === number && "bg-green-950"
             }`}
           >
@@ -60,11 +62,13 @@ const Pagination: React.FC<{
         ))}
         {currentPage < pageNumbers.length - 1 && (
           <>
-            <li className="border border-white/20 p-2 h-[30px] text-xs">...</li>
+            <li className="border border-white/20 p-2 h-[30px] text-xs flex items-center justify-center">
+              ...
+            </li>
             <li
               onClick={() => paginate(pageNumbers.length)}
-              className={`border border-white/20 p-2 h-[30px] ${
-                currentPage === pageNumbers.length ? "bg-yellow-300" : ""
+              className={`border border-white/20 p-2 h-[30px] text-xs flex items-center justify-center${
+                currentPage === pageNumbers.length ? "bg-green-500" : ""
               }`}
             >
               {pageNumbers.length}

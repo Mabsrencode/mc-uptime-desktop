@@ -53,7 +53,8 @@ export async function GET(req: Request) {
     const search = searchParams.get("search");
     const type = searchParams.get("type");
     const status = searchParams.get("status");
-    console.log(status);
+    const page = searchParams.get("page") || "1";
+    const perPage = searchParams.get("perPage") || "5";
 
     if (!userId) {
       return NextResponse.json(
@@ -62,13 +63,11 @@ export async function GET(req: Request) {
       );
     }
 
-    const url = search
-      ? `${
-          environments.API_URL
-        }/user-sites/${userId}?search=${encodeURIComponent(
-          search
-        )}&type=${type}&status=${status}`
-      : `${environments.API_URL}/user-sites/${userId}?search=${search}&type=${type}&status=${status}`;
+    const url = `${
+      environments.API_URL
+    }/user-sites/${userId}?search=${encodeURIComponent(
+      search || ""
+    )}&type=${type}&status=${status}&page=${page}&perPage=${perPage}`;
 
     const response = await fetch(url, {
       method: "GET",

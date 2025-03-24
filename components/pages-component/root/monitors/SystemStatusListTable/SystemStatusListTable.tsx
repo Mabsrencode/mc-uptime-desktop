@@ -17,6 +17,7 @@ import { useStatusStore } from "@/stores/useStatusStore";
 import { useRouter } from "next/navigation";
 import filterData from "./filterData";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import Pagination from "@/components/reusable/Pagination/Pagination";
 interface Checks {
   up: boolean;
 }
@@ -68,21 +69,24 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const [statusFilter, setStatusFilter] = useState<"up" | "down" | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedMonitors, setSelectedMonitors] = useState<string[]>([]);
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(10);
   const handleStatusFilterChange = (status: "up" | "down") => {
     setStatusFilter((prev) => (prev === status ? null : status));
   };
   const fetchMonitors = async (
     searchTerm: string = "",
     type: string = "",
-    status: "up" | "down" | null = null
-  ): Promise<Monitor[]> => {
-    if (!userId) return [];
+    status: "up" | "down" | null = null,
+    page: number = currentPage,
+    perPage: number = postsPerPage
+  ): Promise<{ data: Monitor[]; total: number }> => {
+    if (!userId) return { data: [], total: 0 };
     const response = await fetch(
-      `/api/monitor?userId=${userId}&search=${searchTerm}&type=${type}&status=${status}`
+      `/api/monitor?userId=${userId}&search=${searchTerm}&type=${type}&status=${status}&page=${page}&perPage=${perPage}`
     );
     if (!response.ok) throw new Error("Failed to fetch monitors");
-    return (await response.json()).data;
+    return await response.json();
   };
 
   const fetchStatus = async (): Promise<SiteStatusData> => {
@@ -93,8 +97,23 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   };
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["sites", userId, searchTerm, monitorTypesFilter, statusFilter],
-    queryFn: () => fetchMonitors(searchTerm, monitorTypesFilter, statusFilter),
+    queryKey: [
+      "sites",
+      userId,
+      searchTerm,
+      monitorTypesFilter,
+      statusFilter,
+      currentPage,
+      postsPerPage,
+    ],
+    queryFn: () =>
+      fetchMonitors(
+        searchTerm,
+        monitorTypesFilter,
+        statusFilter,
+        currentPage,
+        postsPerPage
+      ),
     refetchInterval: 60000,
     retry: false,
     enabled: !!userId,
@@ -177,11 +196,24 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       toast.error(error.message || "Failed to delete monitors");
     },
   });
-
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const nextPage = () => {
+    if (data?.total && currentPage < Math.ceil(data.total / postsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+  const previousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, monitorTypesFilter, statusFilter]);
   if (error) return <div>{error.message}</div>;
   return (
     <div className="text-white w-full mt-6">
-      {(data && data.length > 0) ||
+      {(data && data.data.length > 0) ||
       searchTerm ||
       monitorTypesFilter ||
       statusFilter ? (
@@ -191,11 +223,11 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               <input
                 type="checkbox"
                 id="bulk"
-                checked={selectedMonitors.length === data?.length}
+                checked={selectedMonitors.length === data?.data.length}
                 onChange={(e) => {
                   if (e.target.checked) {
                     setSelectedMonitors(
-                      data?.map((monitor) => monitor.id) || []
+                      data?.data.map((monitor) => monitor.id) || []
                     );
                   } else {
                     setSelectedMonitors([]);
@@ -208,8 +240,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                 htmlFor="bulk"
               >
                 {selectedMonitors.length}/
-                {data && data.length ? (
-                  data.length
+                {data && data.data.length ? (
+                  data.data.length
                 ) : (
                   <AiOutlineLoading3Quarters className="animate-spin font-bold duration-150" />
                 )}
@@ -340,10 +372,10 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         </div>
       ) : error ? (
         <div>{(error as any).message}</div>
-      ) : data && data.length === 0 ? (
-        (data && data.length === 0 && searchTerm) ||
-        (data && data.length === 0 && monitorTypesFilter) ||
-        (data && data.length === 0 && statusFilter) ? (
+      ) : data && data.data.length === 0 ? (
+        (data && data.data.length === 0 && searchTerm) ||
+        (data && data.data.length === 0 && monitorTypesFilter) ||
+        (data && data.data.length === 0 && statusFilter) ? (
           <div className="mt-24 mx-auto w-[400px]">
             <h4 className="manrope text-center text-xl manrope font-bold">
               🤐 No <span className="text-green-500">results</span> match your
@@ -404,7 +436,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
           </div>
         )
       ) : (
-        data?.map((monitor) => {
+        data?.data.map((monitor) => {
           const st = status?.sites.find((s) => s.id.toString() === monitor.id);
           const reverseIncidentData = monitor.incident.toReversed();
           return (
@@ -529,6 +561,18 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
             </div>
           );
         })
+      )}
+      {data && data?.total > postsPerPage && (
+        <div className="mt-8">
+          <Pagination
+            postsPerPage={postsPerPage}
+            totalPosts={data.total}
+            paginate={paginate}
+            previousPage={previousPage}
+            nextPage={nextPage}
+            currentPage={currentPage}
+          />
+        </div>
       )}
     </div>
   );
