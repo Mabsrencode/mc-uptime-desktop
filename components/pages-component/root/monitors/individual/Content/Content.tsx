@@ -3,17 +3,21 @@ import ResponseTimeGraph from "@/components/reusable/ResponseTimeGraph/ResponseT
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
 import { useQuery } from "@tanstack/react-query";
 import { subDays, startOfDay, endOfDay } from "date-fns";
+import { BsThreeDots } from "react-icons/bs";
 import {
   MdOutlineFileDownload,
   MdOutlineFileUpload,
   MdOutlineMonitor,
 } from "react-icons/md";
 import { GoGraph } from "react-icons/go";
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import PingStatus from "@/components/reusable/PingStatus/PingStatus";
 import { useRouter } from "next/navigation";
 import TableStatus from "@/components/reusable/TableStatus/TableStatus";
+import { IoChevronBack } from "react-icons/io5";
+import { BiBell } from "react-icons/bi";
+import { IoIosSettings } from "react-icons/io";
 export interface IncidentsI {
   id: string;
   siteId: string;
@@ -55,6 +59,7 @@ export interface SiteStatus {
   notification: NotificationI[] | null;
 }
 const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
+  const [incidentsLimit, setIncidentsLimit] = useState(5);
   const router = useRouter();
   const handleGetMonitor = async () => {
     const response = await fetch(
@@ -72,6 +77,9 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   });
   const handleNavigateIncident = (id: string) => {
     router.push(`/incidents/${id}`);
+  };
+  const loadMoreIncidents = () => {
+    setIncidentsLimit((prev) => prev + 5);
   };
   if (isLoading) return <UptimeLoading />;
   if (error)
@@ -91,12 +99,19 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
+      <Link
+        href={"/monitors"}
+        className="inline transition-all bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-2 rounded text-sm font-medium text-white"
+      >
+        <IoChevronBack className="inline" />
+        Monitors
+      </Link>
       <div className="w-full flex items-center justify-between gap-6 mt-12">
         <div className="flex items-center gap-4">
           <PingStatus up={reversedChecksData[0].up ?? false} />
           <div>
             <h1 className="text-xl manrope font-bold">
-              Ongoing incident on {data?.url.split("//")[1]}
+              {data?.url.split("//")[1]}
             </h1>
             <p className="text-gray-400 mt-1 text-xs">
               {data?.monitorType === "HTTP" ? "HTTP/S" : "HTTP"} monitor for{" "}
@@ -104,14 +119,18 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
             </p>
           </div>
         </div>
-        <div>
-          <Link
-            href={"/monitors"}
-            className="flex items-center gap-2 py-2 px-3 bg-green-700 rounded text-xs cursor-pointer"
-          >
-            <MdOutlineMonitor />
-            Go to Monitor
-          </Link>
+        <div className="flex items-center gap-2">
+          <button className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
+            <BiBell />
+            Test Notification
+          </button>
+          <button className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
+            <IoIosSettings />
+            Edit
+          </button>
+          <button className="transition-all hover:bg-white/20 rounded p-2 cursor-pointer text-gray-400  hover:text-white">
+            <BsThreeDots className=" rotate-90" />
+          </button>
         </div>
       </div>
       <div className="bg-green-950 p-8 rounded w-full mt-6">
@@ -170,11 +189,16 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
               bordered={false}
               showUrl={false}
             />
-            <div className="flex justify-center mt-4 w-full px-6">
-              <button className="bg-[#000d07]/70 text-white px-4 py-2 rounded-lg hover:bg-black/50 cursor-pointer text-xs w-full shadow">
-                Load more incidents
-              </button>
-            </div>
+            {data.incident.length > incidentsLimit && (
+              <div className="flex justify-center mt-4 w-full px-6">
+                <button
+                  onClick={loadMoreIncidents}
+                  className="bg-[#000d07]/70 text-white px-4 py-2 rounded-lg hover:bg-black/50 cursor-pointer text-xs w-full shadow"
+                >
+                  Load more incidents
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <p className="text-center text-gray-400 mt-4">
