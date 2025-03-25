@@ -9,7 +9,8 @@ import {
   TbLayoutSidebarRightExpandFilled,
 } from "react-icons/tb";
 import { IoIosClose } from "react-icons/io";
-
+import { TbSeo } from "react-icons/tb";
+import { PiSpeedometerFill } from "react-icons/pi";
 import { usePathname, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 const navigationItems = [
@@ -27,6 +28,16 @@ const navigationItems = [
     link: "/status",
     name: "Status pages",
     icon: <HiOutlineStatusOnline />,
+  },
+  {
+    link: "/seo",
+    name: "SEO",
+    icon: <TbSeo />,
+  },
+  {
+    link: "/page-insight",
+    name: "Page Insight",
+    icon: <PiSpeedometerFill />,
   },
 ];
 
