@@ -20,6 +20,8 @@ import { IoChevronBack } from "react-icons/io5";
 import { BiBell } from "react-icons/bi";
 import { IoIosSettings } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
+import { TbSeo } from "react-icons/tb";
+import { PiSpeedometerFill } from "react-icons/pi";
 export interface IncidentsI {
   id: string;
   siteId: string;
@@ -166,8 +168,12 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
             )}
           </div>
           <button className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
-            <IoIosSettings />
-            Edit
+            <TbSeo />
+            SEO
+          </button>
+          <button className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
+            <PiSpeedometerFill />
+            Performance
           </button>
           <button className="transition-all hover:bg-white/20 rounded p-2 cursor-pointer text-gray-400  hover:text-white">
             <BsThreeDots className=" rotate-90" />
