@@ -1,7 +1,8 @@
 "use client";
+import "./style.css";
 import ResponseTimeGraph from "@/components/reusable/ResponseTimeGraph/ResponseTimeGraph";
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { subDays, startOfDay, endOfDay } from "date-fns";
 import { BsThreeDots } from "react-icons/bs";
 import {
@@ -67,7 +68,8 @@ export interface SiteStatus {
 const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const [incidentsLimit, setIncidentsLimit] = useState(5);
   const [openTestNotifContainer, setOpenTestNotifContainer] = useState(false);
-  const [isSendingNotification, setIsSendingNotification] = useState(false);
+  const [openAnalyzeSEO, setOpenAnalyzeSEO] = useState(false);
+  const [openAnalyzePerformance, setOpenAnalyzePerformance] = useState(false);
   const router = useRouter();
   const handleGetMonitor = async () => {
     const response = await fetch(
@@ -77,38 +79,50 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
     const data = response.json();
     return data;
   };
-  const handleTestNotification = async () => {
+
+  const sendTestNotification = async (data: {
+    url: string;
+    email: string;
+    type: "UP" | "DOWN";
+    error: string;
+    details: string;
+  }) => {
+    const response = await fetch("/api/monitor/monitor-status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to send test notification");
+    }
+
+    return response.json();
+  };
+  const { mutate: testNotification, isPending: isSendingNotification } =
+    useMutation({
+      mutationFn: sendTestNotification,
+      onSuccess: (result) => {
+        toast.success(result.message);
+        setOpenTestNotifContainer(false);
+      },
+      onError: (error) => {
+        console.error("Error sending test notification:", error);
+      },
+    });
+  const handleTestNotification = () => {
     if (!data) return;
     const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
-    try {
-      setIsSendingNotification(true);
-      const response = await fetch("/api/monitor/monitor-status", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          url: data.url,
-          email: data.email,
-          type: reversedChecksData[0].up ? "UP" : "DOWN",
-          error: "This is a test error notification",
-          details:
-            "This is a test notification to verify email alerts are working",
-        }),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to send test notification");
-      }
 
-      const result = await response.json();
-      toast.success(result.message);
-
-      setOpenTestNotifContainer(false);
-    } catch (error) {
-      console.error("Error sending test notification:", error);
-    } finally {
-      setIsSendingNotification(false);
-    }
+    testNotification({
+      url: data.url,
+      email: data.email,
+      type: reversedChecksData[0].up ? "UP" : "DOWN",
+      error: "This is a test error notification",
+      details: "This is a test notification to verify email alerts are working",
+    });
   };
   const { data, isLoading, error } = useQuery<SiteStatus>({
     queryKey: ["monitor-status", siteId],
@@ -139,6 +153,35 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
+      {openAnalyzeSEO && (
+        <>
+          <div
+            onClick={() => setOpenAnalyzeSEO(!openAnalyzeSEO)}
+            className="bg-black/70 w-full h-full fixed top-0 left-0 z-[1000]"
+          ></div>
+          <div className="seo_container w-1/2 text-center fixed bg-green-950 rounded z-[1000] border border-white/20">
+            <div className="relative p-4">
+              <IoIosClose
+                onClick={() => setOpenAnalyzeSEO(!openAnalyzeSEO)}
+                className="absolute top-1 right-1 text-2xl  hover:bg-white/20 rounded-full cursor-pointer transition-all"
+              />
+              <h3 className="manrope text-4xl font-bold">
+                <span className="text-green-500">SEO</span> Audits with{" "}
+                <span className="text-green-500">Ease</span>
+              </h3>
+              <p className="text-xs text-gray-400 mt-2">
+                Search Engines rely on many factors to rank a website. MC Uptime
+                SEO Analyzer is a Website SEO Checker which reviews these and
+                more to help identify problems that could be holding your site
+                back from it&apos;s potential.
+              </p>
+              <button className="transition-all w-full mt-4 text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
+                Analyze your website now
+              </button>
+            </div>
+          </div>
+        </>
+      )}
       <Link
         href={"/monitors"}
         className="inline transition-all bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-2 rounded text-sm font-medium text-white"
@@ -222,7 +265,10 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
               </div>
             )}
           </div>
-          <button className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
+          <button
+            onClick={() => setOpenAnalyzeSEO(!openAnalyzeSEO)}
+            className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
+          >
             <TbSeo />
             SEO
           </button>
