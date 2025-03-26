@@ -167,7 +167,7 @@ const Content = () => {
                 type="submit"
                 disabled={loginMutation.isPending}
               >
-                {loginMutation.isPending ? <LoaderSpinner /> : "Log In"}
+                {loginMutation.isPending ? <LoaderSpinner bigger /> : "Log In"}
               </button>
 
               <button

@@ -18,10 +18,12 @@ import { useRouter } from "next/navigation";
 import TableStatus from "@/components/reusable/TableStatus/TableStatus";
 import { IoChevronBack } from "react-icons/io5";
 import { BiBell } from "react-icons/bi";
-import { IoIosSettings } from "react-icons/io";
+import { IoIosSettings, IoIosClose } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import { TbSeo } from "react-icons/tb";
 import { PiSpeedometerFill } from "react-icons/pi";
+import toast from "react-hot-toast";
+import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
 export interface IncidentsI {
   id: string;
   siteId: string;
@@ -65,6 +67,7 @@ export interface SiteStatus {
 const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const [incidentsLimit, setIncidentsLimit] = useState(5);
   const [openTestNotifContainer, setOpenTestNotifContainer] = useState(false);
+  const [isSendingNotification, setIsSendingNotification] = useState(false);
   const router = useRouter();
   const handleGetMonitor = async () => {
     const response = await fetch(
@@ -73,6 +76,39 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
     if (!response.ok) throw new Error("Failed to fetch monitor status");
     const data = response.json();
     return data;
+  };
+  const handleTestNotification = async () => {
+    if (!data) return;
+    const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
+    try {
+      setIsSendingNotification(true);
+      const response = await fetch("/api/monitor/monitor-status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: data.url,
+          email: data.email,
+          type: reversedChecksData[0].up ? "UP" : "DOWN",
+          error: "This is a test error notification",
+          details:
+            "This is a test notification to verify email alerts are working",
+        }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to send test notification");
+      }
+
+      const result = await response.json();
+      toast.success(result.message);
+
+      setOpenTestNotifContainer(false);
+    } catch (error) {
+      console.error("Error sending test notification:", error);
+    } finally {
+      setIsSendingNotification(false);
+    }
   };
   const { data, isLoading, error } = useQuery<SiteStatus>({
     queryKey: ["monitor-status", siteId],
@@ -100,7 +136,6 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       const checkTime = new Date(check.checkedAt).getTime();
       return checkTime >= yesterdayStart && checkTime <= todayEnd;
     }) || [];
-  console.log(data);
   const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
@@ -135,35 +170,55 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
             </button>
             {openTestNotifContainer && (
               <div className="absolute w-[400px] shadow p-2 top-10 rounded right-0 bg-green-950 border border-white/20 overflow-hidden z-[500]">
-                <h3 className="text-sm manrope font-bold">
-                  Send test notifications .
-                </h3>
-                <div className="mt-2">
-                  <span className="text-gray-400 text-xs">
-                    Attached people and integrations
-                  </span>
-                  <div className="mt-2 border-y border-white/20 my-8 p-2">
-                    {data && data?.email ? (
-                      <div className="relative flex items-center gap-2 justify-between">
-                        <div className=" flex items-center gap-2">
-                          <div className="flex justify-center items-center bg-[#000d07]/70 text-xl rounded-full h-8 w-8">
-                            <h3>
-                              {data.email.split("")[0].toUpperCase()}
-                              <span className="text-green-500">.</span>
-                            </h3>
+                <div className="relative">
+                  <IoIosClose
+                    onClick={() =>
+                      setOpenTestNotifContainer(!openTestNotifContainer)
+                    }
+                    className="absolute top-0 right-0 text-2xl  hover:bg-white/20 rounded-full cursor-pointer transition-all"
+                  />
+                  <h3 className="text-sm manrope font-bold">
+                    Send test notifications.
+                  </h3>
+                  <div className="mt-2">
+                    <span className="text-gray-400 text-xs">
+                      Attached people and integrations
+                    </span>
+                    <div className="mt-2 border-y border-white/20 my-8 p-2">
+                      {data && data?.email ? (
+                        <div className="relative flex items-center gap-2 justify-between">
+                          <div className=" flex items-center gap-2">
+                            <div className="flex justify-center items-center bg-[#000d07]/70 text-xl rounded-full h-8 w-8">
+                              <h3>
+                                {data.email.split("")[0].toUpperCase()}
+                                <span className="text-green-500">.</span>
+                              </h3>
+                            </div>
+                            <span className="text-xs">{data.email}</span>
                           </div>
-                          <span className="text-xs">{data.email}</span>
+                          <MdEmail />
                         </div>
-                        <MdEmail />
+                      ) : (
+                        <div className="rounded-full h-11 w-11 bg-gray-400 animate-pulse"></div>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    disabled={isSendingNotification}
+                    onClick={handleTestNotification}
+                    className="bg-green-700  hover:bg-green-700/70 rounded transition-all text-xs disabled:bg-gray-800 disabled:cursor-not-allowed cursor-pointer w-full p-2 flex items-center justify-center gap-2"
+                  >
+                    {isSendingNotification ? (
+                      <div className="flex items-center gap-2">
+                        <LoaderSpinner bigger={false} /> Sending...
                       </div>
                     ) : (
-                      <div className="rounded-full h-11 w-11 bg-gray-400 animate-pulse"></div>
+                      <>
+                        <BiBell /> Send test notifications
+                      </>
                     )}
-                  </div>
+                  </button>
                 </div>
-                <button className="bg-green-700 hover:bg-green-700/70 rounded transition-all text-xs disabled:bg-gray-800 disabled:cursor-not-allowed cursor-pointer w-full p-2 flex items-center justify-center gap-2">
-                  <BiBell /> Send test notifications
-                </button>
               </div>
             )}
           </div>

@@ -166,7 +166,11 @@ const Content = () => {
                       className="font-semibold disabled:opacity-70 cursor-pointer block w-full mt-6 2xl:mt-8 text-white inter py-3 px-6 transition-all hover:bg-green-500/70 bg-green-500"
                       type="submit"
                     >
-                      {verifyMutation.isPending ? <LoaderSpinner /> : "Verify"}
+                      {verifyMutation.isPending ? (
+                        <LoaderSpinner bigger />
+                      ) : (
+                        "Verify"
+                      )}
                     </button>
                   </div>
                 </div>
@@ -230,7 +234,7 @@ const Content = () => {
                 disabled={registerMutation.isPending}
               >
                 {registerMutation.isPending ? (
-                  <LoaderSpinner />
+                  <LoaderSpinner bigger />
                 ) : (
                   "Register now"
                 )}

@@ -46,3 +46,55 @@ export async function GET(req: Request) {
     );
   }
 }
+
+export async function POST(req: Request) {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("mc-access-tk")?.value;
+
+    if (!accessToken) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { url, email, type, error, details } = body;
+
+    if (!url || !email || !type) {
+      return NextResponse.json(
+        { message: "Required fields are missing" },
+        { status: 400 }
+      );
+    }
+
+    const response = await fetch(`${environments.API_URL}/test-notification`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url,
+        email,
+        type,
+        error: error || "Test error",
+        details: details || "Test details",
+      }),
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error("Encore API error:", data);
+      return NextResponse.json(
+        { message: "Error sending test notification", error: data },
+        { status: response.status }
+      );
+    }
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return NextResponse.json(
+      { message: "Server error", error: String(error) },
+      { status: 500 }
+    );
+  }
+}
