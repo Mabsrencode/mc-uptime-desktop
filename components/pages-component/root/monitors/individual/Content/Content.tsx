@@ -25,6 +25,7 @@ import { TbSeo } from "react-icons/tb";
 import { PiSpeedometerFill } from "react-icons/pi";
 import toast from "react-hot-toast";
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
+import SEOResults from "../SEOResults/SEOResults";
 export interface IncidentsI {
   id: string;
   siteId: string;
@@ -120,7 +121,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       url: data.url,
       email: data.email,
       type: reversedChecksData[0].up ? "UP" : "DOWN",
-      error: "This is a test error notification",
+      error: "This is a test error notification.",
       details: "This is a test notification to verify email alerts are working",
     });
   };
@@ -135,29 +136,6 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
     router.push(`/incidents/${id}`);
   };
 
-  interface KeywordDensityData {
-    SEO: number;
-    analysis: number;
-    website: number;
-  }
-  interface SEOResponseI {
-    url: string;
-    title: string;
-    description: string;
-    h1: string;
-    imagesWithoutAlt: number;
-    totalLinks: number;
-    internalLinks: number;
-    externalLinks: number;
-    brokenLinks: number;
-    keywordDensity: KeywordDensityData[];
-    isMobileFriendly: boolean;
-    loadTime: number;
-    seoScore: number;
-    message: string;
-    error?: string | null;
-    details?: string | null;
-  }
   const handleAnalyzeSEO = async () => {
     if (!data) return;
     const response = await fetch(
@@ -167,6 +145,20 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
     const responseData = response.json();
     return responseData;
   };
+  const {
+    mutate: analyzeSEO,
+    data: analyzingSEOData,
+    isPending: isAnalyzingSEO,
+  } = useMutation<SEOResponseI>({
+    mutationFn: handleAnalyzeSEO,
+    onSuccess: (value) => {
+      toast.success(value.message);
+      setOpenAnalyzeSEO(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const loadMoreIncidents = () => {
     setIncidentsLimit((prev) => prev + 5);
   };
@@ -187,6 +179,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
+      {analyzingSEOData && <SEOResults data={analyzingSEOData} />}
       {openAnalyzeSEO && (
         <>
           <div
@@ -203,15 +196,29 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
                 <span className="text-green-500">SEO</span> Audits with{" "}
                 <span className="text-green-500">Ease</span>
               </h3>
-              <p className="text-xs text-gray-400 mt-2">
-                Search Engines rely on many factors to rank a website. MC Uptime
-                SEO Analyzer is a Website SEO Checker which reviews these and
-                more to help identify problems that could be holding your site
-                back from it&apos;s potential.
-              </p>
-              <button className="transition-all w-full mt-4 text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
-                Analyze your website now
-              </button>
+              {isAnalyzingSEO ? (
+                <div className="mt-4">
+                  <LoaderSpinner bigger={true} />
+                  <p className="text-sm text-gray-400 mt-4">
+                    Analyzing your website...
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Search Engines rely on many factors to rank a website. MC
+                    Uptime SEO Analyzer is a Website SEO Checker which reviews
+                    these and more to help identify problems that could be
+                    holding your site back from it&apos;s potential.
+                  </p>
+                  <button
+                    onClick={() => analyzeSEO()}
+                    className="transition-all w-full mt-4 text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
+                  >
+                    Analyze your website now
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </>

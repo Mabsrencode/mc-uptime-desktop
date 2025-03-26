@@ -21,3 +21,28 @@ declare interface IncidentLogsData {
 }
 
 //incident types end
+
+// seo data types
+declare interface KeywordDensityData {
+  SEO: number;
+  analysis: number;
+  website: number;
+}
+declare interface SEOResponseI {
+  url: string;
+  title: string;
+  description: string;
+  h1: string;
+  imagesWithoutAlt: number;
+  totalLinks: number;
+  internalLinks: number;
+  externalLinks: number;
+  brokenLinks: number;
+  keywordDensity: KeywordDensityData[];
+  isMobileFriendly: boolean;
+  loadTime: number;
+  seoScore: number;
+  message: string;
+  error?: string | null;
+  details?: string | null;
+}

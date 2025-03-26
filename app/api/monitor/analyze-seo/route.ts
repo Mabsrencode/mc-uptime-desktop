@@ -16,7 +16,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: "URL is required" }, { status: 400 });
     }
     const response = await fetch(
-      `${environments.API_URL}/analyze-seo/${siteUrl}`,
+      `${environments.API_URL}/analyze-seo/${encodeURIComponent(siteUrl)}`,
       {
         method: "GET",
         headers: {
