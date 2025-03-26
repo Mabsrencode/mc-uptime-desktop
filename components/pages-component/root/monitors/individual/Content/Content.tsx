@@ -124,6 +124,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       details: "This is a test notification to verify email alerts are working",
     });
   };
+
   const { data, isLoading, error } = useQuery<SiteStatus>({
     queryKey: ["monitor-status", siteId],
     queryFn: handleGetMonitor,
@@ -132,6 +133,39 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   });
   const handleNavigateIncident = (id: string) => {
     router.push(`/incidents/${id}`);
+  };
+
+  interface KeywordDensityData {
+    SEO: number;
+    analysis: number;
+    website: number;
+  }
+  interface SEOResponseI {
+    url: string;
+    title: string;
+    description: string;
+    h1: string;
+    imagesWithoutAlt: number;
+    totalLinks: number;
+    internalLinks: number;
+    externalLinks: number;
+    brokenLinks: number;
+    keywordDensity: KeywordDensityData[];
+    isMobileFriendly: boolean;
+    loadTime: number;
+    seoScore: number;
+    message: string;
+    error?: string | null;
+    details?: string | null;
+  }
+  const handleAnalyzeSEO = async () => {
+    if (!data) return;
+    const response = await fetch(
+      `/api/monitor/analyze-seo?siteUrl=${data.url}`
+    );
+    if (!response.ok) throw new Error("Failed to analyze SEO");
+    const responseData = response.json();
+    return responseData;
   };
   const loadMoreIncidents = () => {
     setIncidentsLimit((prev) => prev + 5);
