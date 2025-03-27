@@ -2,7 +2,7 @@ import environments from "@/lib/environment";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function POST(req: Request) {
   try {
     const cookieStore = await cookies();
     const accessToken = cookieStore.get("mc-access-tk")?.value;
@@ -10,21 +10,19 @@ export async function GET(req: Request) {
     if (!accessToken) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    const { searchParams } = new URL(req.url);
-    const siteUrl = searchParams.get("siteUrl");
-    if (!siteUrl) {
+    const body = await req.json();
+    const { url, followRedirects } = body;
+    if (!url) {
       return NextResponse.json({ message: "URL is required" }, { status: 400 });
     }
-    const response = await fetch(
-      `${environments.API_URL}/analyze-seo/${encodeURIComponent(siteUrl)}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${environments.API_URL}/analyze-seo/`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url, followRedirects }),
+    });
     const data = await response.json();
     if (!response.ok) {
       const errorData = await response.json();

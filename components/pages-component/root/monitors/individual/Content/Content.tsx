@@ -70,7 +70,9 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const [incidentsLimit, setIncidentsLimit] = useState(5);
   const [openTestNotifContainer, setOpenTestNotifContainer] = useState(false);
   const [openAnalyzeSEO, setOpenAnalyzeSEO] = useState(false);
+  const [showAnalyzeSEOReport, setShowAnalyzeSEOReport] = useState(false);
   const [openAnalyzePerformance, setOpenAnalyzePerformance] = useState(false);
+  const [isFollowRedirect, setIsFollowRedirect] = useState(false);
   const router = useRouter();
   const handleGetMonitor = async () => {
     const response = await fetch(
@@ -138,9 +140,16 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
 
   const handleAnalyzeSEO = async () => {
     if (!data) return;
-    const response = await fetch(
-      `/api/monitor/analyze-seo?siteUrl=${data.url}`
-    );
+    const response = await fetch(`/api/monitor/analyze-seo`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url: data.url,
+        followRedirects: isFollowRedirect,
+      }),
+    });
     if (!response.ok) throw new Error("Failed to analyze SEO");
     const responseData = response.json();
     return responseData;
@@ -151,9 +160,10 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
     isPending: isAnalyzingSEO,
   } = useMutation<SEOResponseI>({
     mutationFn: handleAnalyzeSEO,
-    onSuccess: (value) => {
-      toast.success(value.message);
+    onSuccess: () => {
+      toast.success("Analyzing SEO Successfully.");
       setOpenAnalyzeSEO(false);
+      setShowAnalyzeSEOReport(true);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -179,7 +189,13 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
-      {analyzingSEOData && <SEOResults data={analyzingSEOData} />}
+      {analyzingSEOData && showAnalyzeSEOReport && (
+        <SEOResults
+          handlerValue={showAnalyzeSEOReport}
+          data={analyzingSEOData}
+          setHandler={setShowAnalyzeSEOReport}
+        />
+      )}
       {openAnalyzeSEO && (
         <>
           <div
@@ -211,12 +227,28 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
                     these and more to help identify problems that could be
                     holding your site back from it&apos;s potential.
                   </p>
-                  <button
-                    onClick={() => analyzeSEO()}
-                    className="transition-all w-full mt-4 text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
-                  >
-                    Analyze your website now
-                  </button>
+                  <div className="mt-4 flex flex-row-reverse items-center gap-2 p-2 border border-white/20 rounded">
+                    <div className="flex items-center gap-2">
+                      <input
+                        checked={isFollowRedirect}
+                        onChange={(e) => setIsFollowRedirect(e.target.checked)}
+                        type="checkbox"
+                        id="follow_redirects"
+                      />
+                      <label
+                        htmlFor="follow_redirects"
+                        className="text-xs text-nowrap"
+                      >
+                        Follow Redirects
+                      </label>
+                    </div>
+                    <button
+                      onClick={() => analyzeSEO()}
+                      className="transition-all w-full text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
+                    >
+                      Analyze your website now
+                    </button>
+                  </div>
                 </>
               )}
             </div>

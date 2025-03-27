@@ -62,14 +62,12 @@ const createWindow = async () => {
         responseHeaders: {
           ...details.responseHeaders,
           "Content-Security-Policy": [
-            `default-src 'self'; 
-             script-src 'self' ${
-               isDev
-                 ? "'unsafe-inline' 'unsafe-eval'"
-                 : "'nonce-randomStringHere'"
-             }; 
+            `script-src 'self' ${
+              isDev
+                ? "'unsafe-inline' 'unsafe-eval'"
+                : "'nonce-randomStringHere'"
+            }; 
              style-src 'self' 'unsafe-inline'; 
-             img-src 'self' data:; 
              font-src 'self'; 
              connect-src 'self' ${isDev ? "ws://localhost:*" : ""}; 
              frame-src 'none';`,

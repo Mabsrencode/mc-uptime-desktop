@@ -32,12 +32,10 @@ export default function RootLayout({
         <meta
           httpEquiv="Content-Security-Policy"
           content={`
-            default-src 'self';
             script-src 'self' ${
               isDev ? "'unsafe-inline' 'unsafe-eval'" : `'nonce-${nonce}'`
             };
             style-src 'self' 'unsafe-inline';
-            img-src 'self' data:;
             font-src 'self';
             connect-src 'self' ${isDev ? "ws://localhost:*" : ""};
             frame-src 'none';
