@@ -3,3 +3,19 @@
   left: 50%;
   transform: translate(-50%, -50%);
 }
+.seo_result_container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.seo_result_container::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+.seo_result_container::-webkit-scrollbar-thumb {
+  background: #494949;
+  border-radius: 10px;
+}
+
+.seo_result_container::-webkit-scrollbar-thumb:hover {
+  background: #8f8f8f;
+}

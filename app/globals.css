@@ -22,3 +22,20 @@ body {
 .roboto {
   font-family: "Roboto", sans-serif;
 }
+::-webkit-scrollbar {
+  width: 6px;
+  background-color: #191919;
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #494949;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8f8f8f;
+}

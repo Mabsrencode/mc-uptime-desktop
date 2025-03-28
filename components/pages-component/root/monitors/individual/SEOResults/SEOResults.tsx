@@ -118,7 +118,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
               </div>
             </div>
           </div>
-          <div className="mt-12 bg-green-950 p-4 rounded border border-white/20">
+          <div className="mt-12  p-4 rounded border border-white/20">
             <h3 className="text-4xl manrope font-bold">Summary Report</h3>
             <Divider />
             <div>
@@ -154,7 +154,104 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
             <Divider />
             <div>
               <h2 className=" manrope">Headings</h2>
+              <ul className="text-sm text-gray-400 mt-2 grid gap-4">
+                <li>
+                  <h3>Heading: h1</h3>
+                  <span>Count: {data.headings.h1.count}</span>
+                  <p>
+                    Text:{" "}
+                    {data.headings.h1.texts.length > 0
+                      ? data.headings.h1.texts.map((e, index) => (
+                          <span key={index}>{e}</span>
+                        ))
+                      : "No h1 tags found"}
+                  </p>
+                </li>
+                <li>
+                  <h3>Heading: h2</h3>
+                  <span>Count: {data.headings.h2.count}</span>
+                  <p>
+                    Text:{" "}
+                    {data.headings.h2.texts.length > 0
+                      ? data.headings.h2.texts.map((e, index) => (
+                          <span key={index}>{e}</span>
+                        ))
+                      : "No h1 tags found"}
+                  </p>
+                </li>
+                <li>
+                  <h3>Heading: h3</h3>
+                  <span>Count: {data.headings.h3.count}</span>
+                  <p>
+                    Text:{" "}
+                    {data.headings.h3.texts.length > 0
+                      ? data.headings.h3.texts.map((e, index) => (
+                          <span key={index}>{e}</span>
+                        ))
+                      : "No h3 tags found"}
+                  </p>
+                </li>
+              </ul>
+              <p className="mt-2 text-sm text-gray-400">
+                HTML header tags are an important way of signaling to search
+                engines the important content topics of your page, and
+                subsequently the keywords it should rank for.
+              </p>
             </div>
+            <Divider />
+            <div className="flex flex-row-reverse items-start gap-4 justify-between">
+              <div className="w-1/2">
+                <h2 className="manrope">Images</h2>
+                <div className="mt-2 text-sm text-gray-400">
+                  <p>Total: {data.images.total}</p>
+                  <p>With Alt: {data.images.withAlt}</p>
+                  <p>Without Alt: {data.images.withoutAlt}</p>
+                </div>
+              </div>
+              <div className="w-1/2">
+                <h2 className="manrope">Links</h2>
+                <div className="mt-2 text-sm text-gray-400">
+                  <p>Broken Link: {data.links.broken}</p>
+                  <p>External: {data.links.external}</p>
+                  <p>Internal: {data.links.internal}</p>
+                  <p>Ratio: {data.links.ratio}</p>
+                  <p>Total: {data.links.total}</p>
+                </div>
+              </div>
+            </div>
+            <Divider />
+            <div>
+              <h2 className="manrope">Keywords</h2>
+              <div className="mt-2 text-sm text-gray-400">
+                <h2 className="text-white"> Density</h2>
+                <ul className="mt-2">
+                  {Object.entries(data.keywords.density).map(([key, value]) => (
+                    <li key={key}>
+                      <p>
+                        {key}: {value}{" "}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-2">
+                  <h2 className="text-white">Prominent </h2>
+                  <ul className="mt-2">
+                    {data.keywords.prominent.map((e, index) => (
+                      <li key={index}>
+                        <span>{e}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <p className="mt-2 text-sm text-gray-400">
+                Your page content should be focused around particular keywords
+                you would like to rank for. Ideally these keywords should also
+                be distributed across tags such as the title, meta and header
+                tags.
+              </p>
+            </div>
+            <Divider />
           </div>
         </div>
       </div>
