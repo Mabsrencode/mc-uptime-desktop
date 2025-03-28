@@ -252,6 +252,106 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
               </p>
             </div>
             <Divider />
+            <div>
+              <h2 className="manrope text-3xl font-semibold">Structure</h2>
+              <div className="grid grid-cols-3 grid-rows-1 gap-4">
+                <div className="mt-4 border border-white/20 rounded w-full p-2">
+                  <h5 className="font-bold manrope text-xl">Mobile</h5>
+                  <div className="text-sm text-gray-400 border border-white/20 rounded p-2 mt-2">
+                    <p>
+                      Mobile Friendly:{" "}
+                      <span className="text-white">
+                        {data.mobile.friendly ? "Yes" : "No"}
+                      </span>
+                    </p>
+                    <p>
+                      Tap Targets:{" "}
+                      <span className="text-white">
+                        {data.mobile.tapTargets ? "Yes" : "No"}
+                      </span>
+                    </p>
+                    <p>
+                      Viewport:{" "}
+                      <span className="text-white">
+                        {data.mobile.viewport ? "Yes" : "No"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 border border-white/20 rounded w-full p-2">
+                  <h5 className="font-bold manrope text-xl">Performance</h5>
+                  <div className="text-sm text-gray-400 border border-white/20 rounded p-2 mt-2">
+                    <p>
+                      Load Time:{" "}
+                      <span className="text-white">
+                        {data.performance.loadTime.toFixed() ?? 0} ms
+                      </span>
+                    </p>
+                    <p>
+                      Page Size:{" "}
+                      <span className="text-white">
+                        {data.performance.pageSize ?? "unknown"}
+                      </span>
+                    </p>
+                    <p>
+                      Request:{" "}
+                      <span className="text-white">
+                        {data.performance.requests ?? 0}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-4 border border-white/20 rounded w-full p-2">
+                  <h5 className="font-bold manrope text-xl">SEO Structure</h5>
+                  <div className="text-sm text-gray-400 border border-white/20 rounded p-2 mt-2">
+                    <p>
+                      Canonical:{" "}
+                      <span className="text-white">
+                        {data.structure.canonical ?? "None"}
+                      </span>
+                    </p>
+                    <p>
+                      Language:{" "}
+                      <span className="text-white">
+                        {data.structure.lang ?? "EN"}
+                      </span>
+                    </p>
+                    <p>
+                      Schema Markup:{" "}
+                      <span className="text-white">
+                        {data.structure.schemaMarkup ? "Yes" : "No"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Divider />
+              <div>
+                <h2 className="manrope text-3xl font-semibold text-red-400">
+                  Warnings
+                </h2>
+                <ul className="mt-2">
+                  {data.warnings.map((e, index) => (
+                    <li key={index} className="text-sm text-gray-400">
+                      {index + 1}. {e}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Divider />
+              <div>
+                <h2 className="manrope text-3xl font-semibold text-green-400">
+                  Suggestions
+                </h2>
+                <ul className="mt-2">
+                  {data.suggestions.map((e, index) => (
+                    <li key={index} className="text-sm text-gray-400">
+                      {index + 1}. {e}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
