@@ -22,6 +22,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 const Content = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isSave, setIsSave] = useState<boolean>(false);
   const router = useRouter();
   const {
     register,
@@ -148,6 +149,8 @@ const Content = () => {
               <div className="mt-4 text-sm font-medium text-black-500 flex justify-between items-center">
                 <div>
                   <input
+                    checked={isSave}
+                    onChange={(e) => setIsSave(e.target.checked)}
                     type="checkbox"
                     name="save"
                     id="save"

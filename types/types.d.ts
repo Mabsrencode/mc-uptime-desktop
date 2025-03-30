@@ -1,10 +1,10 @@
 //incident types
 
-declare interface NotificationsData {
+interface NotificationsData {
   sentAt: string;
   type: string;
 }
-declare interface IncidentLogsData {
+interface IncidentLogsData {
   id: string;
   siteId: string;
   startTime: string;
@@ -23,7 +23,7 @@ declare interface IncidentLogsData {
 //incident types end
 
 // seo data types
-declare type SEOResponseI = {
+type SEOResponseI = {
   description: {
     length: number;
     optimal: boolean;
@@ -82,3 +82,18 @@ declare type SEOResponseI = {
     favicon: string;
   };
 };
+// analyze performance types
+
+interface PerformanceResponseI {
+  url: string;
+  loadTime: number;
+  timeToFirstByte: number;
+  pageSize: number;
+  numberOfRequests: number;
+  domContentLoadedTime: number;
+  fullyLoadedTime: number;
+  performanceScore: number;
+  message: string;
+  error?: string;
+  details?: string;
+}

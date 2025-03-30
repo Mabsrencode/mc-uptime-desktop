@@ -2,9 +2,10 @@ import React from "react";
 
 interface ScoreCircleProps {
   score: number;
+  bigger?: boolean;
 }
 
-const ScoreCircle: React.FC<ScoreCircleProps> = ({ score }) => {
+const ScoreCircle: React.FC<ScoreCircleProps> = ({ score, bigger = false }) => {
   const radius = 45;
   const circumference = 2 * Math.PI * radius;
   const progress = (score / 100) * circumference;
@@ -16,7 +17,11 @@ const ScoreCircle: React.FC<ScoreCircleProps> = ({ score }) => {
   };
 
   return (
-    <svg height="80" width="80" viewBox="0 0 100 100">
+    <svg
+      height={bigger ? "120" : "80"}
+      width={bigger ? "120" : "80"}
+      viewBox="0 0 100 100"
+    >
       <circle
         cx="50"
         cy="50"

@@ -1,6 +1,6 @@
 import ScoreCircle from "@/components/reusable/ScoreCircle/ScoCircle";
 import React, { Dispatch, SetStateAction } from "react";
-import "./style.css";
+import "../Content/style.css";
 import { IoIosClose } from "react-icons/io";
 import Image from "next/image";
 import Divider from "@/components/reusable/Divider/Divider";
@@ -14,7 +14,6 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
   setHandler,
   handlerValue,
 }) => {
-  console.log(data.title.optimal);
   return (
     <>
       <div
@@ -290,7 +289,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                     <p>
                       Page Size:{" "}
                       <span className="text-white">
-                        {data.performance.pageSize ?? "unknown"}
+                        {data.performance.pageSize ?? "unknown"} kb
                       </span>
                     </p>
                     <p>

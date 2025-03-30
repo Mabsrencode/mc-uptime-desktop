@@ -26,6 +26,7 @@ import { PiSpeedometerFill } from "react-icons/pi";
 import toast from "react-hot-toast";
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
 import SEOResults from "../SEOResults/SEOResults";
+import PerformanceResult from "../PerformanceResult/PerformanceResult";
 export interface IncidentsI {
   id: string;
   siteId: string;
@@ -71,6 +72,8 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const [openTestNotifContainer, setOpenTestNotifContainer] = useState(false);
   const [openAnalyzeSEO, setOpenAnalyzeSEO] = useState(false);
   const [showAnalyzeSEOReport, setShowAnalyzeSEOReport] = useState(false);
+  const [showAnalyzePerformanceReport, setShowAnalyzePerformanceReport] =
+    useState(false);
   const [openAnalyzePerformance, setOpenAnalyzePerformance] = useState(false);
   const [isFollowRedirect, setIsFollowRedirect] = useState(false);
   const router = useRouter();
@@ -169,6 +172,38 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       toast.error(error.message);
     },
   });
+
+  const handleAnalyzePerformance = async () => {
+    if (!data) return;
+    const response = await fetch(`/api/monitor/analyze-performance`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url: data.url,
+      }),
+    });
+    if (!response.ok) throw new Error("Failed to analyze Performance");
+    const responseData = response.json();
+    return responseData;
+  };
+
+  const {
+    mutate: analyzePerformance,
+    data: analyzedPerformanceData,
+    isPending: isAnalyzingPerformance,
+  } = useMutation<PerformanceResponseI>({
+    mutationFn: handleAnalyzePerformance,
+    onSuccess: () => {
+      toast.success("Analyzing Performance Successfully.");
+      setOpenAnalyzePerformance(false);
+      setShowAnalyzePerformanceReport(true);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
   const loadMoreIncidents = () => {
     setIncidentsLimit((prev) => prev + 5);
   };
@@ -187,6 +222,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       return checkTime >= yesterdayStart && checkTime <= todayEnd;
     }) || [];
   const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
+  console.log(analyzedPerformanceData);
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
       {analyzingSEOData && showAnalyzeSEOReport && (
@@ -194,6 +230,13 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
           handlerValue={showAnalyzeSEOReport}
           data={analyzingSEOData}
           setHandler={setShowAnalyzeSEOReport}
+        />
+      )}
+      {analyzedPerformanceData && showAnalyzePerformanceReport && (
+        <PerformanceResult
+          handlerValue={showAnalyzePerformanceReport}
+          data={analyzedPerformanceData}
+          setHandler={setShowAnalyzePerformanceReport}
         />
       )}
       {openAnalyzeSEO && (
@@ -273,45 +316,32 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
                 <span className="text-green-500">Analyze Performance</span> with{" "}
                 <span className="text-green-500">Ease</span>
               </h3>
-              {/* {isAnalyzingSEO ? (
+              {isAnalyzingPerformance ? (
                 <div className="mt-4">
                   <LoaderSpinner bigger={true} />
                   <p className="text-sm text-gray-400 mt-4">
-                    Analyzing your website...
+                    Analyzing performance...
                   </p>
                 </div>
               ) : (
                 <>
                   <p className="text-xs text-gray-400 mt-2">
-                    Search Engines rely on many factors to rank a website. MC
-                    Uptime SEO Analyzer is a Website SEO Checker which reviews
-                    these and more to help identify problems that could be
-                    holding your site back from it&apos;s potential.
+                    Ease Performance is a tool designed to monitor, evaluate,
+                    and optimize system or application performance. It collects
+                    key metrics such as speed, efficiency, and resource usage,
+                    providing real-time insights and detailed reports to enhance
+                    overall performance and reliability.
                   </p>
                   <div className="mt-4 flex flex-row-reverse items-center gap-2 p-2 border border-white/20 rounded">
-                    <div className="flex items-center gap-2">
-                      <input
-                        checked={isFollowRedirect}
-                        onChange={(e) => setIsFollowRedirect(e.target.checked)}
-                        type="checkbox"
-                        id="follow_redirects"
-                      />
-                      <label
-                        htmlFor="follow_redirects"
-                        className="text-xs text-nowrap"
-                      >
-                        Follow Redirects
-                      </label>
-                    </div>
                     <button
-                      onClick={() => analyzeSEO()}
+                      onClick={() => analyzePerformance()}
                       className="transition-all w-full text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
                     >
-                      Analyze your website now
+                      Analyze performance now
                     </button>
                   </div>
                 </>
-              )} */}
+              )}
             </div>
           </div>
         </>
