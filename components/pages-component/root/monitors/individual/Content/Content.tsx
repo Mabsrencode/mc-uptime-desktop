@@ -255,6 +255,67 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
           </div>
         </>
       )}
+      {openAnalyzePerformance && (
+        <>
+          <div
+            onClick={() => setOpenAnalyzePerformance(!openAnalyzePerformance)}
+            className="bg-black/70 w-full h-full fixed top-0 left-0 z-[1000]"
+          ></div>
+          <div className="performance_container w-1/2 text-center fixed bg-green-950 rounded z-[1000] border border-white/20">
+            <div className="relative p-4">
+              <IoIosClose
+                onClick={() =>
+                  setOpenAnalyzePerformance(!openAnalyzePerformance)
+                }
+                className="absolute top-1 right-1 text-2xl  hover:bg-white/20 rounded-full cursor-pointer transition-all"
+              />
+              <h3 className="manrope text-4xl font-bold">
+                <span className="text-green-500">Analyze Performance</span> with{" "}
+                <span className="text-green-500">Ease</span>
+              </h3>
+              {/* {isAnalyzingSEO ? (
+                <div className="mt-4">
+                  <LoaderSpinner bigger={true} />
+                  <p className="text-sm text-gray-400 mt-4">
+                    Analyzing your website...
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Search Engines rely on many factors to rank a website. MC
+                    Uptime SEO Analyzer is a Website SEO Checker which reviews
+                    these and more to help identify problems that could be
+                    holding your site back from it&apos;s potential.
+                  </p>
+                  <div className="mt-4 flex flex-row-reverse items-center gap-2 p-2 border border-white/20 rounded">
+                    <div className="flex items-center gap-2">
+                      <input
+                        checked={isFollowRedirect}
+                        onChange={(e) => setIsFollowRedirect(e.target.checked)}
+                        type="checkbox"
+                        id="follow_redirects"
+                      />
+                      <label
+                        htmlFor="follow_redirects"
+                        className="text-xs text-nowrap"
+                      >
+                        Follow Redirects
+                      </label>
+                    </div>
+                    <button
+                      onClick={() => analyzeSEO()}
+                      className="transition-all w-full text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
+                    >
+                      Analyze your website now
+                    </button>
+                  </div>
+                </>
+              )} */}
+            </div>
+          </div>
+        </>
+      )}
       <Link
         href={"/monitors"}
         className="inline transition-all bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-2 rounded text-sm font-medium text-white"
@@ -345,7 +406,10 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
             <TbSeo />
             SEO
           </button>
-          <button className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer">
+          <button
+            onClick={() => setOpenAnalyzePerformance(!openAnalyzePerformance)}
+            className="transition-all flex items-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
+          >
             <PiSpeedometerFill />
             Performance
           </button>
