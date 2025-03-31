@@ -33,71 +33,73 @@ const PerformanceResult: React.FC<SEOResultsDataI> = ({
             </button>
           </div>
 
-          <div className="p-2w-full mt-12">
-            <div className="flex items-start gap-4">
-              <div className="w-1/2">
-                <h3 className="text-xl manrope font-bold">
-                  {data?.url.split("//")[1]}
-                </h3>
-                <p className="text-gray-400 mt-1 text-xs">
-                  Performance summary report for {data?.url}
-                </p>
-              </div>
-              <div className="w-1/2 p-4 border border-white/20 rounded flex items-center gap-4 ">
-                <ScoreCircle score={data.performanceScore} />
+          <div className="p-2 w-full mt-12">
+            <div className="flex flex-col justify-center items-center gap-4 p-4">
+              <div className="w-1/2 p-4 border border-white/20 rounded">
                 <div>
-                  <h5 className="text-2xl font-bold manrope text-green-500">
-                    Score
-                  </h5>
+                  <h3 className="text-xl manrope font-bold">
+                    {data?.url.split("//")[1]}
+                  </h3>
+                  <p className="text-gray-400 mt-1 text-xs">
+                    Performance summary report for {data?.url}
+                  </p>
+                </div>
+                <div className="mt-6 p-4  flex items-center gap-4 ">
+                  <ScoreCircle score={data.performanceScore} />
+                  <div>
+                    <h5 className="text-2xl font-bold manrope text-green-500">
+                      Score
+                    </h5>
 
-                  <ul className="mt-1 grid grid-cols-2 grid-rows-2 gap-x-4 p-2 border border-white/20 rounded">
-                    <li className="">
-                      <h3 className="text-xs text-gray-400">
-                        Load time:{" "}
-                        <span className="text-white">
-                          {data.loadTime.toFixed()} ms
-                        </span>
-                      </h3>
-                    </li>
-                    <li className="">
-                      <h3 className="text-xs text-gray-400">
-                        Time to first byte:{" "}
-                        <span className="text-white">
-                          {data.timeToFirstByte.toFixed()}
-                        </span>
-                      </h3>
-                    </li>
-                    <li className="">
-                      <h3 className="text-xs text-gray-400">
-                        Page Size:{" "}
-                        <span className="text-white">{data.pageSize} kb</span>
-                      </h3>
-                    </li>
-                    <li className="">
-                      <h3 className="text-xs text-gray-400">
-                        Number of Requests:{" "}
-                        <span className="text-white">
-                          {data.numberOfRequests}
-                        </span>
-                      </h3>
-                    </li>
-                    <li className="">
-                      <h3 className="text-xs text-gray-400">
-                        Dom Content Loaded Time:{" "}
-                        <span className="text-white">
-                          {data.domContentLoadedTime.toFixed()} ms
-                        </span>
-                      </h3>
-                    </li>
-                    <li className="">
-                      <h3 className="text-xs text-gray-400">
-                        Fully Loaded Time:{" "}
-                        <span className="text-white">
-                          {data.fullyLoadedTime.toFixed()} ms
-                        </span>
-                      </h3>
-                    </li>
-                  </ul>
+                    <ul className="mt-1 grid grid-cols-2 grid-rows-2 gap-x-4 p-2 border border-white/20 rounded">
+                      <li className="">
+                        <h3 className="text-xs text-gray-400">
+                          Load time:{" "}
+                          <span className="text-white">
+                            {data.loadTime.toFixed()} ms
+                          </span>
+                        </h3>
+                      </li>
+                      <li className="">
+                        <h3 className="text-xs text-gray-400">
+                          Time to first byte:{" "}
+                          <span className="text-white">
+                            {data.timeToFirstByte.toFixed()}
+                          </span>
+                        </h3>
+                      </li>
+                      <li className="">
+                        <h3 className="text-xs text-gray-400">
+                          Page Size:{" "}
+                          <span className="text-white">{data.pageSize} kb</span>
+                        </h3>
+                      </li>
+                      <li className="">
+                        <h3 className="text-xs text-gray-400">
+                          Number of Requests:{" "}
+                          <span className="text-white">
+                            {data.numberOfRequests}
+                          </span>
+                        </h3>
+                      </li>
+                      <li className="">
+                        <h3 className="text-xs text-gray-400">
+                          Dom Content Loaded Time:{" "}
+                          <span className="text-white">
+                            {data.domContentLoadedTime.toFixed()} ms
+                          </span>
+                        </h3>
+                      </li>
+                      <li className="">
+                        <h3 className="text-xs text-gray-400">
+                          Fully Loaded Time:{" "}
+                          <span className="text-white">
+                            {data.fullyLoadedTime.toFixed()} ms
+                          </span>
+                        </h3>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
