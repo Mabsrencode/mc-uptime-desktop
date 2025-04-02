@@ -66,13 +66,29 @@ const Content = () => {
             className="rounded py-2 px-4 bg-white w-full outline-none placeholder:text-gray-600 text-black"
             placeholder="https://example.com"
           />
-          <button
-            disabled={isAnalyzingSEO}
-            onClick={() => analyzeSEO()}
-            className="disabled:cursor-not-allowed text-nowrap transition-all text-center py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded h-[40px] w-[300px] cursor-pointer block"
-          >
-            {isAnalyzingSEO ? <LoaderSpinner bigger={false} /> : "Analyze SEO"}
-          </button>
+          <div className="flex flex-row-reverse items-center gap-2 p-1 border border-white/20 rounded">
+            <div className="flex items-center gap-2">
+              <input
+                checked={isFollowRedirects}
+                onChange={(e) => setIsFollowRedirect(e.target.checked)}
+                type="checkbox"
+                id="follow_redirects"
+              />
+              <label htmlFor="follow_redirects" className="text-xs text-nowrap">
+                Follow Redirects
+              </label>
+            </div>
+            <button
+              onClick={() => analyzeSEO()}
+              className="transition-all text-nowrap w-[180px] text-center gap-2 py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded text-xs cursor-pointer"
+            >
+              {isAnalyzingSEO ? (
+                <LoaderSpinner bigger={false} />
+              ) : (
+                "Analyze your website now"
+              )}
+            </button>
+          </div>
         </div>
         <div className="mt-12 text-center w-full">
           <h3 className="manrope text-5xl font-bold">
