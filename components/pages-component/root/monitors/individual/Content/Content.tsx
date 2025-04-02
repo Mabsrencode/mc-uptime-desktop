@@ -11,7 +11,7 @@ import {
   MdOutlineFileUpload,
 } from "react-icons/md";
 import { GoGraph } from "react-icons/go";
-import React, { useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import PingStatus from "@/components/reusable/PingStatus/PingStatus";
 import { useRouter } from "next/navigation";
@@ -65,7 +65,8 @@ export interface SiteStatus {
   incident: IncidentsI[] | null;
   notification: NotificationI[] | null;
 }
-const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
+
+const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
   const [incidentsLimit, setIncidentsLimit] = useState(5);
   const [openTestNotifContainer, setOpenTestNotifContainer] = useState(false);
   const [openAnalyzeSEO, setOpenAnalyzeSEO] = useState(false);
@@ -75,6 +76,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
   const [openAnalyzePerformance, setOpenAnalyzePerformance] = useState(false);
   const [isFollowRedirect, setIsFollowRedirect] = useState(false);
   const router = useRouter();
+
   const handleGetMonitor = async () => {
     const response = await fetch(
       `/api/monitor/monitor-status?siteId=${siteId}`
@@ -83,6 +85,44 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
     const data = response.json();
     return data;
   };
+  const { data, isLoading, error } = useQuery<SiteStatus>({
+    queryKey: ["monitor-status", siteId],
+    queryFn: handleGetMonitor,
+    staleTime: 6000,
+    refetchInterval: 6000,
+  });
+
+  const filteredChecks = useMemo(() => {
+    const yesterdayStart = startOfDay(subDays(new Date(), 1)).getTime();
+    const todayEnd = endOfDay(new Date()).getTime();
+    return (
+      data?.checks?.filter((check) => {
+        const checkTime = new Date(check.checkedAt).getTime();
+        return checkTime >= yesterdayStart && checkTime <= todayEnd;
+      }) || []
+    );
+  }, [data?.checks]);
+
+  const reversedChecksData = useMemo(
+    () => (data?.checks ? [...data.checks].reverse() : []),
+    [data?.checks]
+  );
+
+  const memoizedResponseGraph = useMemo(
+    () => <ResponseTimeGraph data={filteredChecks} />,
+    [filteredChecks]
+  );
+
+  const handleTestNotification = useCallback(() => {
+    if (!data) return;
+    testNotification({
+      url: data.url,
+      email: data.email,
+      type: reversedChecksData[0].up ? "UP" : "DOWN",
+      error: "This is a test error notification.",
+      details: "This is a test notification to verify email alerts are working",
+    });
+  }, [data, reversedChecksData]);
 
   const sendTestNotification = async (data: {
     url: string;
@@ -116,25 +156,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
         console.error("Error sending test notification:", error);
       },
     });
-  const handleTestNotification = () => {
-    if (!data) return;
-    const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
 
-    testNotification({
-      url: data.url,
-      email: data.email,
-      type: reversedChecksData[0].up ? "UP" : "DOWN",
-      error: "This is a test error notification.",
-      details: "This is a test notification to verify email alerts are working",
-    });
-  };
-
-  const { data, isLoading, error } = useQuery<SiteStatus>({
-    queryKey: ["monitor-status", siteId],
-    queryFn: handleGetMonitor,
-    staleTime: 6000,
-    refetchInterval: 6000,
-  });
   const handleNavigateIncident = (id: string) => {
     router.push(`/incidents/${id}`);
   };
@@ -212,15 +234,6 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
         <h1>Something went wrong from the server.</h1>
       </div>
     );
-  const yesterdayStart = startOfDay(subDays(new Date(), 1)).getTime();
-  const todayEnd = endOfDay(new Date()).getTime();
-  const filteredChecks =
-    data?.checks?.filter((check) => {
-      const checkTime = new Date(check.checkedAt).getTime();
-      return checkTime >= yesterdayStart && checkTime <= todayEnd;
-    }) || [];
-  const reversedChecksData = data?.checks ? data.checks.toReversed() : [];
-  console.log(analyzedPerformanceData);
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
       {analyzingSEOData && showAnalyzeSEOReport && (
@@ -450,7 +463,7 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
         <h2 className="text-white text-2xl font-bold manrope mb-2">
           Response Time
         </h2>
-        <ResponseTimeGraph data={filteredChecks} />
+        {memoizedResponseGraph}
         {reversedChecksData && (
           <div className="flex items-center justify-between mt-4 text-white">
             <div className="flex-1">
@@ -521,6 +534,6 @@ const Content: React.FC<{ siteId: string }> = ({ siteId }) => {
       </div>
     </section>
   );
-};
+});
 
 export default Content;
