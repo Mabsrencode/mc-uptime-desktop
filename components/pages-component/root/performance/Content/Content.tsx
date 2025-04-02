@@ -12,7 +12,9 @@ const Content = () => {
   const urlPattern =
     /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/;
   const handleAnalyzePerformance = async () => {
-    if (!urlPattern.test(url)) {
+    if (!url) {
+      throw new Error("URL is required.");
+    } else if (!urlPattern.test(url)) {
       throw new Error("Invalid URL. Please enter a valid URL.");
     }
     const response = await fetch(`/api/monitor/analyze-performance`, {
