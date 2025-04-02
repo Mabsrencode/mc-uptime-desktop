@@ -1,13 +1,13 @@
 "use client";
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
 import { useMutation } from "@tanstack/react-query";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import SEOResults from "../../monitors/individual/SEOResults/SEOResults";
-import { debounce } from "lodash-es";
+import { useDebouncedState } from "@/hooks/useDebouncedState";
 
 const Content = () => {
-  const [url, setUrl] = useState("");
+  const [url, setUrl, cancelUrlUpdate] = useDebouncedState<string>("");
   const [isFollowRedirects, setIsFollowRedirect] = useState(false);
   const [showAnalyzeSEOReport, setShowAnalyzeSEOReport] = useState(false);
 
@@ -55,14 +55,9 @@ const Content = () => {
     },
   });
 
-  const handleUrlChange = useMemo(
-    () =>
-      debounce(
-        (e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value),
-        300
-      ),
-    []
-  );
+  useEffect(() => {
+    return () => cancelUrlUpdate();
+  }, [cancelUrlUpdate]);
 
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
@@ -79,7 +74,7 @@ const Content = () => {
       <div className="w-[75%] mt-32 mx-auto">
         <div className="flex items-center justify-center gap-2 h-full">
           <input
-            onChange={handleUrlChange}
+            onChange={(e) => setUrl(e.target.value)}
             type="text"
             className="rounded py-2 px-4 bg-white w-full outline-none placeholder:text-gray-600 text-black"
             placeholder="https://example.com"
