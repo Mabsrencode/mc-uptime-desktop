@@ -95,7 +95,12 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     const data = await response.json();
     return data;
   };
-
+  interface MonitorFormValues {
+    id?: string;
+    url: string;
+    interval: number;
+    monitorType: string;
+  }
   const { data, isLoading, error } = useQuery({
     queryKey: [
       "sites",
@@ -152,7 +157,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   });
 
   const editMonitor = useMutation({
-    mutationFn: async (updatedMonitor: Monitor) => {
+    mutationFn: async (updatedMonitor: MonitorFormValues) => {
       const response = await fetch("/api/monitor", {
         method: "PUT",
         headers: {
@@ -371,7 +376,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
           ))}
         </div>
       ) : error ? (
-        <div>{(error as any).message}</div>
+        <div>{(error as unknown as Error).message}</div>
       ) : data && data.data.length === 0 ? (
         (data && data.data.length === 0 && searchTerm) ||
         (data && data.data.length === 0 && monitorTypesFilter) ||
@@ -382,9 +387,9 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               criteria<span className="text-green-500">.</span>
             </h4>
             <p className="text-center text-xs mt-2 text-gray-400">
-              We haven't found any monitors based on your search and/or filter
-              criteria. Try expanding your search or clearing your filters to
-              get some results.
+              We haven&apos;t found any monitors based on your search and/or
+              filter criteria. Try expanding your search or clearing your
+              filters to get some results.
             </p>
             <button
               onClick={() => {

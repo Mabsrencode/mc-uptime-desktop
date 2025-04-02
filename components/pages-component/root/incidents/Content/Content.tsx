@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import TableStatus from "@/components/reusable/TableStatus/TableStatus";
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
 import { GoFilter } from "react-icons/go";
-import { IoIosArrowDown } from "react-icons/io";
 import { FaTrash } from "react-icons/fa";
 import Link from "next/link";
 import filterData from "../../monitors/SystemStatusListTable/filterData";
@@ -216,7 +215,7 @@ const Content = () => {
           ))}
         </div>
       ) : error ? (
-        <div>{(error as any).message}</div>
+        <div>{(error as unknown as Error).message}</div>
       ) : data && data.data && data.data.length === 0 ? (
         (data && data.data.length === 0 && searchTerm) ||
         (data && data.data.length === 0 && monitorTypesFilter) ||
@@ -227,9 +226,9 @@ const Content = () => {
               criteria<span className="text-green-500">.</span>
             </h4>
             <p className="text-center text-xs mt-2 text-gray-400">
-              We haven't found any incidents based on your search and/or filter
-              criteria. Try expanding your search or clearing your filters to
-              get some results.
+              We haven&apos;t found any incidents based on your search and/or
+              filter criteria. Try expanding your search or clearing your
+              filters to get some results.
             </p>
             <button
               onClick={() => {

@@ -35,8 +35,8 @@ const navigationItems = [
     icon: <TbSeo />,
   },
   {
-    link: "/page-insight",
-    name: "Page Insight",
+    link: "/performance",
+    name: "Performance",
     icon: <PiSpeedometerFill />,
   },
 ];

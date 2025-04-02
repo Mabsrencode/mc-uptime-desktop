@@ -3,13 +3,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MdArrowDropDownCircle } from "react-icons/md";
-import { GoPlus } from "react-icons/go";
 import { FiRefreshCw } from "react-icons/fi";
 import Divider from "@/components/reusable/Divider/Divider";
 import { IoIosClose } from "react-icons/io";
 import Image from "next/image";
 import { useAuthStore } from "@/stores/useAuthStore";
-import toast from "react-hot-toast";
 import icons from "@/constants/icons";
 
 const monitorTypes = [
@@ -51,6 +49,13 @@ export const urlSchema = z.object({
 
 type FormValues = z.infer<typeof urlSchema>;
 
+interface MonitorFormValues {
+  id?: string;
+  url: string;
+  interval: number;
+  monitorType: string;
+}
+
 interface MonitorFormProps {
   initialValues?: {
     id: string;
@@ -58,7 +63,7 @@ interface MonitorFormProps {
     monitorType: string;
     interval: number;
   };
-  onSubmit: (values: any) => void;
+  onSubmit: (values: MonitorFormValues) => void;
   onCancel: () => void;
 }
 

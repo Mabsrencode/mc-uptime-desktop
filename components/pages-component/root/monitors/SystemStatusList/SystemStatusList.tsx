@@ -92,7 +92,7 @@ const SystemStatusList = () => {
 
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Adding URL successful!");
       setShowFormModal(false);
       reset();

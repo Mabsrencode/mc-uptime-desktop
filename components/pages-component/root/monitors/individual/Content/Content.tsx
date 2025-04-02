@@ -9,7 +9,6 @@ import {
   MdEmail,
   MdOutlineFileDownload,
   MdOutlineFileUpload,
-  MdOutlineMonitor,
 } from "react-icons/md";
 import { GoGraph } from "react-icons/go";
 import React, { useState } from "react";
@@ -19,8 +18,7 @@ import { useRouter } from "next/navigation";
 import TableStatus from "@/components/reusable/TableStatus/TableStatus";
 import { IoChevronBack } from "react-icons/io5";
 import { BiBell } from "react-icons/bi";
-import { IoIosSettings, IoIosClose } from "react-icons/io";
-import { FaTrash } from "react-icons/fa";
+import { IoIosClose } from "react-icons/io";
 import { TbSeo } from "react-icons/tb";
 import { PiSpeedometerFill } from "react-icons/pi";
 import toast from "react-hot-toast";
