@@ -68,7 +68,7 @@ const Content = () => {
           <button
             disabled={isAnalyzingPerformance}
             onClick={() => analyzePerformance()}
-            className="disabled:cursor-not-allowed text-nowrap transition-all text-center py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded h-[40px] w-[300px] cursor-pointer block"
+            className="disabled:cursor-not-allowed text-xs text-nowrap transition-all text-center py-2 px-3 bg-green-700 hover:bg-green-700/70 rounded h-[40px] w-[300px] cursor-pointer block"
           >
             {isAnalyzingPerformance ? (
               <LoaderSpinner bigger={false} />
