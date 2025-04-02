@@ -25,21 +25,24 @@ export default function RootLayout({
 }>) {
   const nonce = nanoid();
   const isDev = process.env.NODE_ENV === "development";
-
+  //  script-src 'self' ${
+  //             isDev ? "'unsafe-inline' 'unsafe-eval'" : `'nonce-${nonce}'`
+  //           };
   return (
     <html lang="en">
       <head>
-        <meta
+        {/* <meta
           httpEquiv="Content-Security-Policy"
           content={`
-            script-src 'self' ${
-              isDev ? "'unsafe-inline' 'unsafe-eval'" : `'nonce-${nonce}'`
-            };
             style-src 'self' 'unsafe-inline';
             font-src 'self';
             connect-src 'self' ${isDev ? "ws://localhost:*" : ""};
             frame-src 'none';
           `}
+        /> */}
+        <script
+          crossOrigin="anonymous"
+          src="//unpkg.com/react-scan/dist/auto.global.js"
         />
       </head>
       <body

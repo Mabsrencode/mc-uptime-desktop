@@ -54,28 +54,28 @@ const createWindow = async () => {
     }
     mainWindow.show();
   });
-
-  mainWindow.webContents.session.webRequest.onHeadersReceived(
-    (details, callback) => {
-      const isDev = !app.isPackaged;
-      callback({
-        responseHeaders: {
-          ...details.responseHeaders,
-          "Content-Security-Policy": [
-            `script-src 'self' ${
-              isDev
-                ? "'unsafe-inline' 'unsafe-eval'"
-                : "'nonce-randomStringHere'"
-            }; 
-             style-src 'self' 'unsafe-inline'; 
-             font-src 'self'; 
-             connect-src 'self' ${isDev ? "ws://localhost:*" : ""}; 
-             frame-src 'none';`,
-          ],
-        },
-      });
-    }
-  );
+  // script-src 'self' ${
+  //               isDev
+  //                 ? "'unsafe-inline' 'unsafe-eval'"
+  //                 : "'nonce-randomStringHere'"
+  //             };
+  // mainWindow.webContents.session.webRequest.onHeadersReceived(
+  //   (details, callback) => {
+  //     const isDev = !app.isPackaged;
+  //     callback({
+  //       responseHeaders: {
+  //         ...details.responseHeaders,
+  //         "Content-Security-Policy": [
+  //           `
+  //            style-src 'self' 'unsafe-inline';
+  //            font-src 'self';
+  //            connect-src 'self' ${isDev ? "ws://localhost:*" : ""};
+  //            frame-src 'none';`,
+  //         ],
+  //       },
+  //     });
+  //   }
+  // );
 };
 
 app.whenReady().then(() => {
