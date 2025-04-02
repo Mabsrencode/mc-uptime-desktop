@@ -65,7 +65,6 @@ export interface SiteStatus {
   incident: IncidentsI[] | null;
   notification: NotificationI[] | null;
 }
-
 const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
   const [incidentsLimit, setIncidentsLimit] = useState(5);
   const [openTestNotifContainer, setOpenTestNotifContainer] = useState(false);
@@ -113,17 +112,6 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
     [filteredChecks]
   );
 
-  const handleTestNotification = useCallback(() => {
-    if (!data) return;
-    testNotification({
-      url: data.url,
-      email: data.email,
-      type: reversedChecksData[0].up ? "UP" : "DOWN",
-      error: "This is a test error notification.",
-      details: "This is a test notification to verify email alerts are working",
-    });
-  }, [data, reversedChecksData]);
-
   const sendTestNotification = async (data: {
     url: string;
     email: string;
@@ -145,6 +133,7 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
 
     return response.json();
   };
+
   const { mutate: testNotification, isPending: isSendingNotification } =
     useMutation({
       mutationFn: sendTestNotification,
@@ -156,7 +145,16 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
         console.error("Error sending test notification:", error);
       },
     });
-
+  const handleTestNotification = useCallback(() => {
+    if (!data) return;
+    testNotification({
+      url: data.url,
+      email: data.email,
+      type: reversedChecksData[0].up ? "UP" : "DOWN",
+      error: "This is a test error notification.",
+      details: "This is a test notification to verify email alerts are working",
+    });
+  }, [data, reversedChecksData, testNotification]);
   const handleNavigateIncident = (id: string) => {
     router.push(`/incidents/${id}`);
   };
@@ -535,5 +533,5 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
     </section>
   );
 });
-
+Content.displayName = "Content";
 export default Content;

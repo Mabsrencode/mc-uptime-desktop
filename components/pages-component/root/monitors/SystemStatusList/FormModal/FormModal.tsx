@@ -79,6 +79,7 @@ const MonitorDropdownItem = React.memo(
     </button>
   )
 );
+MonitorDropdownItem.displayName = "MonitorDropdownItem";
 
 const FormModal: React.FC<{ setShowFormModal: (value: boolean) => void }> = ({
   setShowFormModal,
@@ -363,5 +364,5 @@ const FormModal: React.FC<{ setShowFormModal: (value: boolean) => void }> = ({
     </div>
   );
 };
-
+FormModal.displayName = "FormModal";
 export default FormModal;
