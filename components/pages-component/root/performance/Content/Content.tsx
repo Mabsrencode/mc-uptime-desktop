@@ -1,41 +1,51 @@
 "use client";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import PerformanceResult from "../../monitors/individual/PerformanceResult/PerformanceResult";
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
+import { useDebouncedState } from "@/hooks/useDebouncedState";
+import regex from "@/helper/regex";
 
 const Content = () => {
-  const [url, setUrl] = useState<string>("");
+  const [url, setUrl, cancelUrlUpdate] = useDebouncedState<string>("");
   const [showAnalyzePerformanceReport, setShowAnalyzePerformanceReport] =
     useState<boolean>(false);
-  const urlPattern =
-    /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(:\d+)?(\/.*)?$/;
-  const handleAnalyzePerformance = async () => {
-    if (!url) {
+  const handleAnalyzePerformance = useCallback(async () => {
+    if (!url || !url.includes(".")) {
       throw new Error("URL is required.");
-    } else if (!urlPattern.test(url)) {
+    }
+
+    if (!regex.urlPattern.test(url)) {
       throw new Error("Invalid URL. Please enter a valid URL.");
     }
-    const response = await fetch(`/api/monitor/analyze-performance`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        url: url,
-      }),
-    });
-    if (!response.ok) throw new Error("Failed to analyze Performance");
-    const responseData = response.json();
-    return responseData;
-  };
+    try {
+      const response = await fetch(`/api/monitor/analyze-performance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          url: url,
+        }),
+      });
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Failed to analyze Performance");
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error("API Error:", error);
+      throw error;
+    }
+  }, [url]);
 
   const {
     mutate: analyzePerformance,
     data: analyzedPerformanceData,
     isPending: isAnalyzingPerformance,
-  } = useMutation<PerformanceResponseI>({
+  } = useMutation({
     mutationFn: handleAnalyzePerformance,
     onSuccess: () => {
       toast.success("Analyzing Performance Successfully.");
@@ -45,12 +55,15 @@ const Content = () => {
       toast.error(error.message);
     },
   });
+  useEffect(() => {
+    return () => cancelUrlUpdate();
+  }, [cancelUrlUpdate]);
   return (
     <section className="py-3 px-4 container mx-auto w-full mt-6 text-white">
       <h1 className="text-4xl manrope font-bold">
         Analyze <span className="text-green-500">Performance</span>
       </h1>
-      {analyzedPerformanceData && showAnalyzePerformanceReport && (
+      {showAnalyzePerformanceReport && (
         <PerformanceResult
           handlerValue={showAnalyzePerformanceReport}
           data={analyzedPerformanceData}

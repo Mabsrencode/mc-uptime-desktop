@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import SEOResults from "../../monitors/individual/SEOResults/SEOResults";
 import { useDebouncedState } from "@/hooks/useDebouncedState";
+import regex from "@/helper/regex";
 
 const Content = () => {
   const [url, setUrl, cancelUrlUpdate] = useDebouncedState<string>("");
@@ -16,8 +17,7 @@ const Content = () => {
       throw new Error("URL is required.");
     }
 
-    const urlPattern = /^(https?:\/\/)?[^\s/$.?#].[^\s]*$/i;
-    if (!urlPattern.test(url)) {
+    if (!regex.urlPattern.test(url)) {
       throw new Error("Invalid URL. Please enter a valid URL.");
     }
 

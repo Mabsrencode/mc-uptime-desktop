@@ -4,6 +4,7 @@ import "../Content/style.css";
 import { IoIosClose } from "react-icons/io";
 import Image from "next/image";
 import Divider from "@/components/reusable/Divider/Divider";
+import { IoEarthSharp } from "react-icons/io5";
 interface SEOResultsDataI {
   data: SEOResponseI;
   setHandler: Dispatch<SetStateAction<boolean>>;
@@ -92,12 +93,18 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                 Preview
               </span>
               <div className="flex items-center gap-2">
-                <Image
-                  src={data.serpPreview.favicon}
-                  width={20}
-                  height={20}
-                  alt="favicon"
-                />
+                {data.serpPreview.favicon ? (
+                  <Image
+                    src={data.serpPreview.favicon}
+                    width={20}
+                    height={20}
+                    alt="favicon"
+                  />
+                ) : (
+                  <div className="w-[20px] h-[20px] bg-white rounded-full flex items-center justify-center">
+                    <IoEarthSharp className="text-gray-700" />
+                  </div>
+                )}
                 <div>
                   <h4 className="text-sm">
                     {data.serpPreview.title.split("-")[0]}
