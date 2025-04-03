@@ -225,6 +225,12 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     setCurrentPage(1);
   }, [searchTerm, monitorTypesFilter, statusFilter]);
   if (error) return <div>{error.message}</div>;
+  const clearFilters = () => {
+    setSearchTerm("");
+    setDebouncedSearchTerm("");
+    setMonitorTypesFilter("");
+    setStatusFilter(null);
+  };
   return (
     <div className="text-white w-full mt-6">
       {(data && data.data.length > 0) ||
@@ -356,12 +362,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                     </div>
                   ))}
                   <button
-                    onClick={() => {
-                      setSearchTerm("");
-                      setDebouncedSearchTerm("");
-                      setMonitorTypesFilter("");
-                      setStatusFilter(null);
-                    }}
+                    onClick={() => clearFilters()}
                     className="flex items-center gap-2 justify-center bg-green-950  p-2 border-t border-white/20 hover:bg-[#000d07] cursor-pointer w-full"
                   >
                     <FaTrash className="text-xs" /> Clear all filters
@@ -404,11 +405,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               filters to get some results.
             </p>
             <button
-              onClick={() => {
-                setSearchTerm("");
-                setDebouncedSearchTerm("");
-                setMonitorTypesFilter("");
-              }}
+              onClick={() => clearFilters()}
               className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white flex items-center gap-1 mx-auto mt-4"
             >
               Clear all filters and search
