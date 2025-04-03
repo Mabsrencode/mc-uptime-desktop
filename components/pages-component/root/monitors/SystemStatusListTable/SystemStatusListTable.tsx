@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import filterData from "./filterData";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Pagination from "@/components/reusable/Pagination/Pagination";
+import { useDebouncedState } from "@/hooks/useDebouncedState";
 interface Checks {
   up: boolean;
 }
@@ -68,6 +69,14 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   const [monitorTypesFilter, setMonitorTypesFilter] = useState<string>();
   const [statusFilter, setStatusFilter] = useState<"up" | "down" | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useDebouncedState(
+    "",
+    300
+  );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setDebouncedSearchTerm(e.target.value);
+  };
   const [selectedMonitors, setSelectedMonitors] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(10);
@@ -105,7 +114,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     queryKey: [
       "sites",
       userId,
-      searchTerm,
+      debouncedSearchTerm,
       monitorTypesFilter,
       statusFilter,
       currentPage,
@@ -113,7 +122,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     ],
     queryFn: () =>
       fetchMonitors(
-        searchTerm,
+        debouncedSearchTerm,
         monitorTypesFilter,
         statusFilter,
         currentPage,
@@ -220,6 +229,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     <div className="text-white w-full mt-6">
       {(data && data.data.length > 0) ||
       searchTerm ||
+      debouncedSearchTerm ||
       monitorTypesFilter ||
       statusFilter ? (
         <div className="flex items-center justify-between gap-2 text-xs my-2 w-full">
@@ -281,7 +291,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
           <div className="flex items-center">
             <input
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleChange}
               type="text"
               placeholder="Search by name or URL"
               className="border border-white/20 outline-none px-2 py-1 rounded"
@@ -348,6 +358,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                   <button
                     onClick={() => {
                       setSearchTerm("");
+                      setDebouncedSearchTerm("");
                       setMonitorTypesFilter("");
                       setStatusFilter(null);
                     }}
@@ -379,6 +390,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         <div>{(error as unknown as Error).message}</div>
       ) : data && data.data.length === 0 ? (
         (data && data.data.length === 0 && searchTerm) ||
+        (data && data.data.length === 0 && debouncedSearchTerm) ||
         (data && data.data.length === 0 && monitorTypesFilter) ||
         (data && data.data.length === 0 && statusFilter) ? (
           <div className="mt-24 mx-auto w-[400px]">
@@ -394,6 +406,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
             <button
               onClick={() => {
                 setSearchTerm("");
+                setDebouncedSearchTerm("");
                 setMonitorTypesFilter("");
               }}
               className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white flex items-center gap-1 mx-auto mt-4"
