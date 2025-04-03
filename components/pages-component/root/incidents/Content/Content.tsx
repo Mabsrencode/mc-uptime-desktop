@@ -10,6 +10,7 @@ import { FaTrash } from "react-icons/fa";
 import Link from "next/link";
 import filterData from "../../monitors/SystemStatusListTable/filterData";
 import Pagination from "@/components/reusable/Pagination/Pagination";
+import { useDebouncedState } from "@/hooks/useDebouncedState";
 
 interface GetIncidentsByUserResponse {
   data: IncidentLogsData[] | null;
@@ -19,6 +20,15 @@ interface GetIncidentsByUserResponse {
 const Content = () => {
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useDebouncedState(
+    "",
+    300
+  );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setDebouncedSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
   const [monitorTypesFilter, setMonitorTypesFilter] = useState<string>();
   const [statusFilter, setStatusFilter] = useState<"up" | "down" | null>(null);
 
@@ -60,7 +70,7 @@ const Content = () => {
       queryKey: [
         "incidents",
         userId,
-        searchTerm,
+        debouncedSearchTerm,
         monitorTypesFilter,
         statusFilter,
         currentPage,
@@ -68,7 +78,7 @@ const Content = () => {
       ],
       queryFn: () =>
         handleGetAllIncidents(
-          searchTerm,
+          debouncedSearchTerm,
           monitorTypesFilter,
           statusFilter,
           currentPage,
@@ -93,7 +103,13 @@ const Content = () => {
     }
   };
 
-  if (isLoading && !searchTerm && !monitorTypesFilter && !statusFilter)
+  if (
+    isLoading &&
+    !searchTerm &&
+    !debouncedSearchTerm &&
+    !monitorTypesFilter &&
+    !statusFilter
+  )
     return <UptimeLoading />;
   if (error)
     return (
@@ -102,6 +118,13 @@ const Content = () => {
       </div>
     );
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setDebouncedSearchTerm("");
+    setMonitorTypesFilter("");
+    setStatusFilter(null);
+    setCurrentPage(1);
+  };
   return (
     <section className="text-white w-full px-4 container mx-auto">
       <div className="mt-6 flex w-full justify-between mb-6">
@@ -112,6 +135,7 @@ const Content = () => {
         </div>
         {(data && data.data && data.data.length > 0) ||
         searchTerm ||
+        debouncedSearchTerm ||
         monitorTypesFilter ||
         statusFilter ? (
           <div className="flex items-center gap-2 text-xs my-2 w-full justify-end">
@@ -119,10 +143,7 @@ const Content = () => {
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
+                onChange={handleChange}
                 placeholder="Search by name or URL"
                 className="border border-white/20 outline-none px-2 py-1 rounded"
               />
@@ -183,12 +204,7 @@ const Content = () => {
                       </div>
                     ))}
                     <button
-                      onClick={() => {
-                        setSearchTerm("");
-                        setMonitorTypesFilter("");
-                        setStatusFilter(null);
-                        setCurrentPage(1);
-                      }}
+                      onClick={() => clearFilters()}
                       className="flex items-center gap-2 justify-center bg-green-950  p-2 border-t border-white/20 hover:bg-[#000d07] cursor-pointer w-full"
                     >
                       <FaTrash className="text-xs" /> Clear all filters
@@ -218,6 +234,7 @@ const Content = () => {
         <div>{(error as unknown as Error).message}</div>
       ) : data && data.data && data.data.length === 0 ? (
         (data && data.data.length === 0 && searchTerm) ||
+        (data && data.data.length === 0 && debouncedSearchTerm) ||
         (data && data.data.length === 0 && monitorTypesFilter) ||
         (data && data.data.length === 0 && statusFilter) ? (
           <div className="mt-24 mx-auto w-[400px]">
@@ -231,11 +248,7 @@ const Content = () => {
               filters to get some results.
             </p>
             <button
-              onClick={() => {
-                setSearchTerm("");
-                setMonitorTypesFilter("");
-                setCurrentPage(1);
-              }}
+              onClick={() => clearFilters()}
               className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white flex items-center gap-1 mx-auto mt-4"
             >
               Clear all filters and search
