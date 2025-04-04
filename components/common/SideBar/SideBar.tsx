@@ -25,7 +25,7 @@ const navigationItems = [
     icon: <MdError />,
   },
   {
-    link: "/status",
+    link: "/status-pages",
     name: "Status pages",
     icon: <HiOutlineStatusOnline />,
   },

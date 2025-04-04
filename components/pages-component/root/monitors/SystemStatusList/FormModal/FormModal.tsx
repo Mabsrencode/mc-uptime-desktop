@@ -241,6 +241,10 @@ const FormModal: React.FC<{ setShowFormModal: (value: boolean) => void }> = ({
                   value: true,
                   message: "Please enter the URL to monitor",
                 },
+                pattern: {
+                  value: /^(https?:\/\/)?([\da-z.-]+\.)+[a-z]{2,}$/i,
+                  message: "Please enter a valid URL",
+                },
               })}
               type="text"
               placeholder="https://"
