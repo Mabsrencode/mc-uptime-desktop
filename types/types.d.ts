@@ -55,6 +55,12 @@ type SEOResponseI = {
     friendly: boolean;
     tapTargets: boolean;
     viewport: boolean;
+    rendering?: {
+      contentWidth: number;
+      issues?: string[];
+      simulatedDevice: string;
+      viewportWidth: number;
+    };
   };
   performance: {
     loadTime: number;
@@ -73,6 +79,26 @@ type SEOResponseI = {
     optimal: boolean;
     text: string;
   };
+  social: {
+    openGraph?: {
+      additionalProperties?: Record<string, string>;
+      title?: string;
+      type?: string;
+      image?: string;
+      url?: string;
+      description?: string;
+      site_name?: string;
+      locale?: string;
+      audio?: string;
+      video?: string;
+    };
+    twitterCard?: {
+      card?: string;
+      title?: string;
+      description?: string;
+      image?: string;
+    };
+  };
   url: string;
   warnings: string[];
   serpPreview: {
@@ -81,6 +107,7 @@ type SEOResponseI = {
     url: string;
     favicon: string;
   };
+  htmlContent: string;
 };
 // analyze performance types
 
@@ -96,4 +123,46 @@ interface PerformanceResponseI {
   message: string;
   error?: string;
   details?: string;
+}
+
+// incident types start
+interface IncidentsI {
+  id: string;
+  siteId: string;
+  startTime: string;
+  endTime: string | null;
+  resolved: boolean;
+  error?: string | null;
+  details?: string | null;
+  url: string;
+  email: string;
+  monitorType: string;
+  interval: number;
+  up: boolean;
+  notifications: NotificationsData[] | null;
+}
+interface NotificationI {
+  type: string;
+  sentAt: string;
+}
+interface ChecksI {
+  id: string;
+  up: boolean;
+  checkedAt: string;
+  error?: string | null;
+  details?: string | null;
+  average_response: number | null;
+  max_response?: number | null;
+  min_response?: number | null;
+}
+interface SiteStatus {
+  id: string;
+  url: string;
+  email: string;
+  interval: number;
+  monitorType: string;
+  userId: string;
+  checks: ChecksI[] | null;
+  incident: IncidentsI[] | null;
+  notification: NotificationI[] | null;
 }

@@ -5,6 +5,7 @@ import { IoIosClose } from "react-icons/io";
 import Image from "next/image";
 import Divider from "@/components/reusable/Divider/Divider";
 import { IoEarthSharp } from "react-icons/io5";
+import MobilePreview from "./MobilePreview/MobilePreview";
 interface SEOResultsDataI {
   data: SEOResponseI;
   setHandler: Dispatch<SetStateAction<boolean>>;
@@ -15,6 +16,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
   setHandler,
   handlerValue,
 }) => {
+  console.log(data);
   return (
     <>
       <div
@@ -256,6 +258,102 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                 be distributed across tags such as the title, meta and header
                 tags.
               </p>
+            </div>
+            <Divider />
+            <div>
+              <h2 className="manrope">Socials</h2>
+              <div className="mt-2 text-sm text-gray-400">
+                <div className="flex items-start justify-between gap-4 mt-2">
+                  {data.social.openGraph && (
+                    <div className="border border-white/20 rounded w-full p-2">
+                      <h2 className="text-white">Open Graph</h2>
+                      <div className="mt-2 border border-white/20 rounded p-2 ">
+                        {data.social.openGraph?.site_name && (
+                          <p className="mt-2">
+                            <span className="text-white">Site Name: </span>
+                            {data.social.openGraph?.site_name}
+                          </p>
+                        )}
+                        {data.social.openGraph?.title && (
+                          <p className="mt-2">
+                            <span className="text-white">Title: </span>
+                            {data.social.openGraph?.title}
+                          </p>
+                        )}
+                        {data.social.openGraph?.description && (
+                          <p className="text-sm mt-2">
+                            <span className="text-white">Description: </span>
+                            {data.social.openGraph?.description}
+                          </p>
+                        )}
+                        {data.social.openGraph?.locale && (
+                          <p className="mt-2">
+                            <span className="text-white">Locale: </span>
+                            {data.social.openGraph?.locale}
+                          </p>
+                        )}
+                        {data.social.openGraph?.image && (
+                          <p className="mt-2">
+                            <span className="text-white">
+                              Open Graph Image:{" "}
+                            </span>
+                            {data.social.openGraph?.image}
+                          </p>
+                        )}
+                        {data.social.openGraph?.type && (
+                          <p className="mt-2">
+                            <span className="text-white">Type: </span>
+                            {data.social.openGraph?.type}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="border border-white/20 rounded w-full p-2">
+                    <h2 className="text-white">Twitter Card</h2>
+                    <div className="mt-2 border border-white/20 rounded p-2">
+                      {data.social.twitterCard?.title && (
+                        <p className="mt-2">
+                          <span className="text-white">Title: </span>
+                          {data.social.twitterCard?.title}
+                        </p>
+                      )}
+                      {data.social.twitterCard?.description && (
+                        <p className="mt-2">
+                          <span className="text-white">Description: </span>
+                          {data.social.twitterCard?.description}
+                        </p>
+                      )}
+                      {data.social.twitterCard?.image && (
+                        <p className="mt-2">
+                          <span className="text-white">Image: </span>
+                          {data.social.twitterCard?.image}
+                        </p>
+                      )}
+                      {data.social.twitterCard?.card && (
+                        <p className="mt-2">
+                          <span className="text-white">Card: </span>
+                          {data.social.twitterCard?.card}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <Divider />
+            <div>
+              <h2>Mobile Preview</h2>
+              {data.htmlContent ? (
+                <MobilePreview
+                  htmlContent={data.htmlContent}
+                  finalUrl={data.url}
+                  viewportWidth={data.mobile.rendering?.viewportWidth || 390}
+                />
+              ) : (
+                <p>No mobile preview available.</p>
+              )}
             </div>
             <Divider />
             <div>

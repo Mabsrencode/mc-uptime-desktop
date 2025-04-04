@@ -25,51 +25,11 @@ import toast from "react-hot-toast";
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
 import SEOResults from "../SEOResults/SEOResults";
 import PerformanceResult from "../PerformanceResult/PerformanceResult";
-export interface IncidentsI {
-  id: string;
-  siteId: string;
-  startTime: string;
-  endTime: string | null;
-  resolved: boolean;
-  error?: string | null;
-  details?: string | null;
-  url: string;
-  email: string;
-  monitorType: string;
-  interval: number;
-  up: boolean;
-  notifications: NotificationsData[] | null;
-}
-export interface NotificationI {
-  type: string;
-  sentAt: string;
-}
-export interface ChecksI {
-  id: string;
-  up: boolean;
-  checkedAt: string;
-  error?: string | null;
-  details?: string | null;
-  average_response: number | null;
-  max_response?: number | null;
-  min_response?: number | null;
-}
-export interface SiteStatus {
-  id: string;
-  url: string;
-  email: string;
-  interval: number;
-  monitorType: string;
-  userId: string;
-  checks: ChecksI[] | null;
-  incident: IncidentsI[] | null;
-  notification: NotificationI[] | null;
-}
 const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
   const [incidentsLimit, setIncidentsLimit] = useState(5);
   const [openTestNotifContainer, setOpenTestNotifContainer] = useState(false);
   const [openAnalyzeSEO, setOpenAnalyzeSEO] = useState(false);
-  const [showAnalyzeSEOReport, setShowAnalyzeSEOReport] = useState(false);
+  const [showAnalyzeSEOReport, setShowAnalyzeSEOReport] = useState(true);
   const [showAnalyzePerformanceReport, setShowAnalyzePerformanceReport] =
     useState(false);
   const [openAnalyzePerformance, setOpenAnalyzePerformance] = useState(false);
