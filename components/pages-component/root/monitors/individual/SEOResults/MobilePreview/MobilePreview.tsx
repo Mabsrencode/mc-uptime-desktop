@@ -1,88 +1,45 @@
-import { useRef, useState, useEffect } from "react";
-import DOMPurify from "dompurify";
+import Image from "next/image";
 
-const MobilePreview = ({
-  htmlContent,
-  viewportWidth,
-  finalUrl,
-}: {
-  htmlContent: string;
+interface MobilePreviewProps {
   viewportWidth: number;
-  finalUrl: string;
+  simulatedDevice: string;
+  contentWidth: number;
+  issues: string[];
+  screenshot?: string;
+}
+
+const MobilePreview: React.FC<{ rendering: MobilePreviewProps }> = ({
+  rendering,
 }) => {
-  const [iframeLoaded, setIframeLoaded] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [safeHtml, setSafeHtml] = useState("");
-
-  useEffect(() => {
-    // 1. Fix relative URLs to absolute
-    const baseUrl = new URL(finalUrl);
-    let processedHtml = htmlContent.replace(
-      /(href|src)=(["'])(?!https?:|\/\/)([^"']+)/g,
-      `$1=$2${baseUrl.origin}/$3`
-    );
-
-    // 2. Remove problematic Next.js scripts and links
-    processedHtml = processedHtml
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
-      .replace(/<link[^>]*_next[^>]*>/gi, "");
-
-    // 3. Sanitize HTML
-    const cleanHtml = DOMPurify.sanitize(processedHtml, {
-      ADD_ATTR: ["target"],
-      ADD_TAGS: ["iframe"],
-      FORBID_TAGS: ["script", "style"],
-      FORBID_ATTR: ["onload", "onerror"],
-    });
-
-    setSafeHtml(cleanHtml);
-  }, [htmlContent, finalUrl]);
+  if (!rendering.screenshot) return null;
 
   return (
     <div
-      style={{
-        border: "1px solid #ccc",
-        borderRadius: "8px",
-        overflow: "hidden",
-        width: `${viewportWidth}px`,
-        margin: "0 auto",
-        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-      }}
+      className="border rounded-lg overflow-hidden shadow-lg mx-auto"
+      style={{ width: `${rendering.viewportWidth}px`, maxWidth: "100%" }}
     >
-      <div
-        style={{
-          backgroundColor: "#f5f5f5",
-          padding: "8px",
-          textAlign: "center",
-          borderBottom: "1px solid #ddd",
-        }}
-      >
-        Mobile Preview ({viewportWidth}px)
+      <div className="bg-gray-100 py-2 border-b border-black/20">
+        <h4 className="text-center text-sm font-bold text-black">
+          {rendering.simulatedDevice}
+        </h4>
       </div>
-      <iframe
-        ref={iframeRef}
-        srcDoc={safeHtml}
-        style={{
-          width: "100%",
-          height: "600px",
-          border: "none",
-          background: "white",
-        }}
-        sandbox="allow-same-origin"
-        onLoad={() => setIframeLoaded(true)}
-      />
-      {!iframeLoaded && (
-        <div
-          style={{
-            width: "100%",
-            height: "600px",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            background: "#f5f5f5",
-          }}
-        >
-          Loading preview...
+      <div className="relative" style={{ height: "600px" }}>
+        <Image
+          src={rendering.screenshot}
+          alt="Mobile preview screenshot"
+          fill
+          className="object-contain bg-white"
+          unoptimized
+        />
+      </div>
+      {rendering.issues.length > 0 && (
+        <div className="bg-yellow-50 p-3 border-t">
+          <h4 className="font-medium text-yellow-800">Mobile Issues:</h4>
+          <ul className="list-disc pl-5 text-yellow-700 text-sm">
+            {rendering.issues.map((issue, i) => (
+              <li key={i}>{issue}</li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

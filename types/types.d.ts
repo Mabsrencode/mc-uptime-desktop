@@ -56,10 +56,11 @@ type SEOResponseI = {
     tapTargets: boolean;
     viewport: boolean;
     rendering?: {
-      contentWidth: number;
-      issues?: string[];
-      simulatedDevice: string;
       viewportWidth: number;
+      simulatedDevice: string;
+      contentWidth: number;
+      issues: string[];
+      screenshot?: string;
     };
   };
   performance: {
@@ -107,7 +108,6 @@ type SEOResponseI = {
     url: string;
     favicon: string;
   };
-  htmlContent: string;
 };
 // analyze performance types
 
