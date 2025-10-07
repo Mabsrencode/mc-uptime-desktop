@@ -11,6 +11,7 @@ import Link from "next/link";
 import filterData from "../../monitors/SystemStatusListTable/filterData";
 import Pagination from "@/components/reusable/Pagination/Pagination";
 import { useDebouncedState } from "@/hooks/useDebouncedState";
+import { useStatusStore } from "@/stores/useStatusStore";
 
 interface GetIncidentsByUserResponse {
   data: IncidentLogsData[] | null;
@@ -18,6 +19,7 @@ interface GetIncidentsByUserResponse {
 }
 
 const Content = () => {
+  const { status } = useStatusStore();
   const [openFilter, setOpenFilter] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useDebouncedState(
@@ -268,12 +270,14 @@ const Content = () => {
               . Ping our servers to track cron jobs and stay on top of critical
               incidents.
             </p>
-            <Link
-              href={"/monitors"}
-              className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white inline"
-            >
-              Start creating your first monitor
-            </Link>
+            {status && status.sites.length === 0 && (
+              <Link
+                href={"/monitors"}
+                className="bg-green-700 hover:bg-green-700/70 cursor-pointer px-3 py-1 rounded text-xs font-medium text-white inline"
+              >
+                Start creating your first monitor
+              </Link>
+            )}
           </div>
         )
       ) : (
