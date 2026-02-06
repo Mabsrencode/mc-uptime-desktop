@@ -4,7 +4,22 @@ import { usePathname } from "next/navigation";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import SideBar from "@/components/common/SideBar/SideBar";
 import { Toaster } from "react-hot-toast";
-const queryClient = new QueryClient();
+import { UnauthorizedError } from "@/lib/authFetch";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error) => {
+        // Don't retry on 401 unauthorized errors
+        if (error instanceof UnauthorizedError) return false;
+        return failureCount < 3;
+      },
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
 
 const publicRoutes = ["/auth/login", "/auth/register"];
 const Layout = ({ children }: { children: React.ReactNode }) => {

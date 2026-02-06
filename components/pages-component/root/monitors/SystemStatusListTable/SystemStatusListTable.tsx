@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from "react";
 import "./style.css";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { authFetch } from "@/lib/authFetch";
 import { BsThreeDots } from "react-icons/bs";
 import { IoIosArrowDown } from "react-icons/io";
 import { GoFilter } from "react-icons/go";
@@ -43,7 +44,7 @@ interface Monitor {
 }
 
 export interface SiteStatus {
-  id: number;
+  id: string;
   up: boolean;
   checkedAt: string;
   error?: string;
@@ -91,7 +92,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     perPage: number = postsPerPage
   ): Promise<{ data: Monitor[]; total: number }> => {
     if (!userId) return { data: [], total: 0 };
-    const response = await fetch(
+    const response = await authFetch(
       `/api/monitor?userId=${userId}&search=${searchTerm}&type=${type}&status=${status}&page=${page}&perPage=${perPage}`
     );
     if (!response.ok) throw new Error("Failed to fetch monitors");
@@ -99,7 +100,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
   };
 
   const fetchStatus = async (): Promise<SiteStatusData> => {
-    const response = await fetch(`/api/monitor/status`);
+    const response = await authFetch(`/api/monitor/status?userId=${userId}`);
     if (!response.ok) throw new Error("Failed to fetch status");
     const data = await response.json();
     return data;
@@ -133,10 +134,11 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
     enabled: !!userId,
   });
   const { data: status } = useQuery({
-    queryKey: ["status"],
+    queryKey: ["status", userId],
     queryFn: fetchStatus,
     refetchInterval: 60000,
     retry: false,
+    enabled: !!userId,
   });
   useEffect(() => {
     if (status) {
@@ -146,7 +148,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
 
   const deleteMonitor = useMutation({
     mutationFn: async (id: string) => {
-      const response = await fetch("/api/monitor", {
+      const response = await authFetch("/api/monitor", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +169,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
 
   const editMonitor = useMutation({
     mutationFn: async (updatedMonitor: MonitorFormValues) => {
-      const response = await fetch("/api/monitor", {
+      const response = await authFetch("/api/monitor", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -191,7 +193,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
       if (ids.length === 0) {
         throw new Error("No monitors selected for deletion.");
       }
-      const response = await fetch(`/api/monitor/bulk-delete?ids=${ids}`, {
+      const response = await authFetch(`/api/monitor/bulk-delete?ids=${ids}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -279,7 +281,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                 Bulk action <IoIosArrowDown />
               </button>
               {openBulk && (
-                <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden z-[500]">
+                <div className="absolute w-[200px] top-7 rounded left-0 bg-green-950 border border-white/20 overflow-hidden z-500">
                   <div className="manrope text-gray-400 bg-[#000d07] w-full p-2 border-b border-white/20">
                     <h1>Monitor Actions</h1>
                   </div>
@@ -338,7 +340,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                 <GoFilter className="inline" /> Filter
               </span>
               {openFilter && (
-                <div className="absolute top-7 left-0 overflow-hidden w-[200px] z-[500] border-b border-x border-white/20 rounded">
+                <div className="absolute top-7 left-0 overflow-hidden w-[200px] z-500 border-b border-x border-white/20 rounded">
                   {filterData.map((e) => (
                     <div
                       key={e.label}
@@ -381,8 +383,8 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
               className="h-[60px] w-full bg-gray-400 animate-pulse rounded border border-white/20 p-4"
             >
               <div className="flex flex-col gap-2">
-                <div className="w-[40%] h-[12px] bg-gray-500 rounded-full"></div>
-                <div className="w-[20%] h-[12px] bg-gray-500 rounded-full"></div>
+                <div className="w-[40%] h-3 bg-gray-500 rounded-full"></div>
+                <div className="w-[20%] h-3 bg-gray-500 rounded-full"></div>
               </div>
             </div>
           ))}
@@ -452,10 +454,10 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
         )
       ) : (
         data?.data.map((monitor) => {
-          const st = status?.sites.find((s) => s.id.toString() === monitor.id);
+          const st = status?.sites.find((s) => s.id === monitor.id);
           const reverseIncidentData = monitor.incident.toReversed();
           return (
-            <div key={monitor.id}>
+            <button key={monitor.id} className="block w-full disabled:opacity-50" disabled={!st?.checkedAt}>
               {editingMonitor?.id === monitor.id ? (
                 <MonitorForm
                   initialValues={editingMonitor}
@@ -478,11 +480,11 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                               View Incident
                             </Link>
                           ) : (
-                            <span className="h-[10px] w-[100px] bg-gray-500 animate-pulse rounded-full"></span>
+                            <span className="h-2.5 w-[100px] bg-gray-500 animate-pulse rounded-full"></span>
                           )}
                         </div>
                         <div className="flex items-center gap-1">
-                          <MdError className="text-red-700 min-w-[20px]" />
+                          <MdError className="text-red-700 min-w-5" />
                           <p className="text-xs text-gray-400 capitalize">
                             {st?.error}
                           </p>
@@ -498,7 +500,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                     </div>
                   </div>
                   <input
-                    className="incident_checkbox absolute z-[1000]"
+                    className="incident_checkbox absolute z-1000"
                     type="checkbox"
                     checked={selectedMonitors.includes(monitor.id)}
                     onChange={(e) => {
@@ -541,13 +543,13 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                           {monitor.url}
                         </h1>
                         <div className="text-gray-400 text-xs mt-1 flex gap-1 items-center">
-                          <p className="border border-white/20 inline py-[2px] px-[3px] rounded bg-black/40">
+                          <p className="border border-white/20 inline py-0.5 px-1 rounded bg-black/40">
                             {monitor.monitorType}
                           </p>
                           {st?.checkedAt ? (
                             <TimeDelta dt={st?.checkedAt} />
                           ) : (
-                            <span className="h-[10px] w-[100px] bg-gray-500 animate-pulse rounded-full"></span>
+                            <span className="h-2.5 w-[100px] bg-gray-500 animate-pulse rounded-full"></span>
                           )}
                         </div>
                       </div>
@@ -581,7 +583,7 @@ const SystemStatusListTable: FC<{ handleShowForm: () => void }> = ({
                   </div>
                 </div>
               )}
-            </div>
+            </button>
           );
         })
       )}

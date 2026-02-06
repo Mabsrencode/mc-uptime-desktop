@@ -6,6 +6,7 @@ import PerformanceResult from "../../monitors/individual/PerformanceResult/Perfo
 import LoaderSpinner from "@/components/reusable/LoaderSpinner/LoaderSpinner";
 import { useDebouncedState } from "@/hooks/useDebouncedState";
 import regex from "@/helper/regex";
+import { authFetch } from "@/lib/authFetch";
 
 const Content = () => {
   const [url, setUrl, cancelUrlUpdate] = useDebouncedState<string>("");
@@ -20,7 +21,7 @@ const Content = () => {
       throw new Error("Invalid URL. Please enter a valid URL.");
     }
     try {
-      const response = await fetch(`/api/monitor/analyze-performance`, {
+      const response = await authFetch(`/api/monitor/analyze-performance`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,4 +1,5 @@
 import environments from "@/lib/environment";
+import { handleUnauthorizedResponse } from "@/lib/handleUnauthorized";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -18,11 +19,12 @@ export async function GET() {
       },
     });
     const data = await response.json();
+    const unauthorizedResponse = await handleUnauthorizedResponse(response);
+    if (unauthorizedResponse) return unauthorizedResponse;
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Encore API error:", errorData);
+      console.error("NestJS API error:", data);
       return NextResponse.json(
-        { message: "Error fetching data", error: errorData },
+        { message: "Error fetching data", error: data },
         { status: response.status }
       );
     }

@@ -1,0 +1,39 @@
+import environments from "@/lib/environment";
+import { handleUnauthorizedResponse } from "@/lib/handleUnauthorized";
+import { cookies } from "next/headers";
+import { NextResponse } from "next/server";
+
+export async function GET() {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get("mc-access-tk")?.value;
+    if (!accessToken) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const response = await fetch(`${environments.API_URL}/dashboard-stats`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await response.json();
+    const unauthorizedResponse = await handleUnauthorizedResponse(response);
+    if (unauthorizedResponse) return unauthorizedResponse;
+    if (!response.ok) {
+      console.error("NestJS API error:", data);
+      return NextResponse.json(
+        { message: "Error fetching data", error: data },
+        { status: response.status }
+      );
+    }
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Fetch error:", error);
+    return NextResponse.json(
+      { message: "Server error", error: String(error) },
+      { status: 500 }
+    );
+  }
+}

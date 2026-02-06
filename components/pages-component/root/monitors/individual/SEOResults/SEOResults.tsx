@@ -16,7 +16,23 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
   setHandler,
   handlerValue,
 }) => {
-  console.log(data);
+  if (!data) return null;
+  
+  const serpPreview = data.serpPreview ?? { title: '', url: data.url ?? '', description: '', favicon: undefined };
+  const title = data.title ?? { text: '', length: 0, optimal: false };
+  const description = data.description ?? { text: '', length: 0, optimal: false };
+  const headings = data.headings ?? { h1: { count: 0, texts: [] }, h2: { count: 0, texts: [] }, h3: { count: 0, texts: [] } };
+  const images = data.images ?? { withAlt: 0, withoutAlt: 0, total: 0 };
+  const links = data.links ?? { total: 0, internal: 0, external: 0, broken: 0, ratio: 0 };
+  const keywords = data.keywords ?? { density: {}, prominent: [] };
+  const mobile = data.mobile ?? { friendly: false, viewport: false, tapTargets: false, rendering: undefined };
+  const perf = data.performance ?? { loadTime: 0, pageSize: 0, requests: 0 };
+  const structure = data.structure ?? { canonical: null, lang: null, schemaMarkup: false };
+  const social = data.social ?? {};
+  const warnings = data.warnings ?? [];
+  const suggestions = data.suggestions ?? [];
+  const seoScore = data.seoScore ?? 0;
+  
   return (
     <>
       <div
@@ -41,14 +57,14 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
             <div className="w-1/2">
               <div>
                 <h3 className="text-xl manrope font-bold">
-                  {data?.url.split("//")[1]}
+                  {(data?.url ?? '').split("//")[1]}
                 </h3>
                 <p className="text-gray-400 mt-1 text-xs">
-                  Seo audit for {data?.url}
+                  Seo audit for {data?.url ?? ''}
                 </p>
               </div>
               <div className="mt-8 flex items-center gap-4 ">
-                <ScoreCircle score={data.seoScore} />
+                <ScoreCircle score={seoScore} />
                 <div>
                   <h5 className="text-2xl font-bold manrope text-green-500">
                     SEO Score
@@ -58,7 +74,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                       <h3 className="text-xs text-gray-400">
                         Mobile Friendly:{" "}
                         <span className="text-white">
-                          {data.mobile.friendly ? "Yes" : "No"}
+                          {mobile.friendly ? "Yes" : "No"}
                         </span>
                       </h3>
                     </li>
@@ -66,7 +82,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                       <h3 className="text-xs text-gray-400">
                         Language:{" "}
                         <span className="uppercase text-white">
-                          {data.structure.lang ?? "EN"}
+                          {structure.lang ?? "EN"}
                         </span>
                       </h3>
                     </li>
@@ -74,7 +90,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                       <h3 className="text-xs text-gray-400">
                         Schema Markup:{" "}
                         <span className="text-white">
-                          {data.structure.schemaMarkup ? "Yes" : "No"}
+                          {structure.schemaMarkup ? "Yes" : "No"}
                         </span>
                       </h3>
                     </li>
@@ -82,7 +98,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                       <h3 className="text-xs text-gray-400">
                         Canonical:{" "}
                         <span className="text-white">
-                          {data.structure.canonical ?? "None"}
+                          {structure.canonical ?? "None"}
                         </span>
                       </h3>
                     </li>
@@ -95,9 +111,9 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                 Preview
               </span>
               <div className="flex items-center gap-2">
-                {data.serpPreview.favicon ? (
+                {serpPreview.favicon ? (
                   <Image
-                    src={data.serpPreview.favicon}
+                    src={serpPreview.favicon}
                     width={20}
                     height={20}
                     alt="favicon"
@@ -109,19 +125,19 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                 )}
                 <div>
                   <h4 className="text-sm">
-                    {data.serpPreview.title.split("-")[0]}
+                    {serpPreview.title.split("-")[0]}
                   </h4>
                   <p className="text-xs text-gray-400">
-                    {data.serpPreview.url}
+                    {serpPreview.url}
                   </p>
                 </div>
               </div>
               <div className="mt-2">
                 <h5 className="text-xl text-blue-500 leading-5">
-                  {data.serpPreview.title}
+                  {serpPreview.title}
                 </h5>
                 <p className="text-sm text-gray-300 mt-2">
-                  {data.serpPreview.description}
+                  {serpPreview.description}
                 </p>
               </div>
             </div>
@@ -132,10 +148,10 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
             <div>
               <h2 className=" manrope">Title Tag</h2>
               <div className="text-gray-400 mt-2 text-sm">
-                <h3>{data.title.text}</h3>
-                <span className=" mt-2">Length: {data.title.length}</span>
+                <h3>{title.text}</h3>
+                <span className=" mt-2">Length: {title.length}</span>
                 <span className=" block">
-                  Optimal: {data.title.optimal ? "Yes" : "No"}
+                  Optimal: {title.optimal ? "Yes" : "No"}
                 </span>
                 <p className="mt-2">
                   Title tags are very important for search engines to correctly
@@ -147,10 +163,10 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
             <div>
               <h2 className=" manrope">Description Tag</h2>
               <div className="text-gray-400 mt-2 text-sm">
-                <h3>{data.description.text}</h3>
-                <span className=" mt-2">Length: {data.description.length}</span>
+                <h3>{description.text}</h3>
+                <span className=" mt-2">Length: {description.length}</span>
                 <span className=" block">
-                  Optimal: {data.description.optimal ? "Yes" : "No"}
+                  Optimal: {description.optimal ? "Yes" : "No"}
                 </span>
                 <p className="mt-2">
                   A meta description is important for search engines to
@@ -165,11 +181,11 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
               <ul className="text-sm text-gray-400 mt-2 grid gap-4">
                 <li>
                   <h3>Heading: h1</h3>
-                  <span>Count: {data.headings.h1.count}</span>
+                  <span>Count: {headings.h1.count}</span>
                   <p>
                     Text:{" "}
-                    {data.headings.h1.texts.length > 0
-                      ? data.headings.h1.texts.map((e, index) => (
+                    {headings.h1.texts.length > 0
+                      ? headings.h1.texts.map((e, index) => (
                           <span key={index}>{e}</span>
                         ))
                       : "No h1 tags found"}
@@ -177,23 +193,23 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                 </li>
                 <li>
                   <h3>Heading: h2</h3>
-                  <span>Count: {data.headings.h2.count}</span>
+                  <span>Count: {headings.h2.count}</span>
                   <p>
                     Text:{" "}
-                    {data.headings.h2.texts.length > 0
-                      ? data.headings.h2.texts.map((e, index) => (
+                    {headings.h2.texts.length > 0
+                      ? headings.h2.texts.map((e, index) => (
                           <span key={index}>{e}</span>
                         ))
-                      : "No h1 tags found"}
+                      : "No h2 tags found"}
                   </p>
                 </li>
                 <li>
                   <h3>Heading: h3</h3>
-                  <span>Count: {data.headings.h3.count}</span>
+                  <span>Count: {headings.h3.count}</span>
                   <p>
                     Text:{" "}
-                    {data.headings.h3.texts.length > 0
-                      ? data.headings.h3.texts.map((e, index) => (
+                    {headings.h3.texts.length > 0
+                      ? headings.h3.texts.map((e, index) => (
                           <span key={index}>{e}</span>
                         ))
                       : "No h3 tags found"}
@@ -211,19 +227,19 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
               <div className="w-1/2">
                 <h2 className="manrope">Images</h2>
                 <div className="mt-2 text-sm text-gray-400">
-                  <p>Total: {data.images.total}</p>
-                  <p>With Alt: {data.images.withAlt}</p>
-                  <p>Without Alt: {data.images.withoutAlt}</p>
+                  <p>Total: {images.total}</p>
+                  <p>With Alt: {images.withAlt}</p>
+                  <p>Without Alt: {images.withoutAlt}</p>
                 </div>
               </div>
               <div className="w-1/2">
                 <h2 className="manrope">Links</h2>
                 <div className="mt-2 text-sm text-gray-400">
-                  <p>Broken Link: {data.links.broken}</p>
-                  <p>External: {data.links.external}</p>
-                  <p>Internal: {data.links.internal}</p>
-                  <p>Ratio: {data.links.ratio}</p>
-                  <p>Total: {data.links.total}</p>
+                  <p>Broken Link: {links.broken}</p>
+                  <p>External: {links.external}</p>
+                  <p>Internal: {links.internal}</p>
+                  <p>Ratio: {links.ratio}</p>
+                  <p>Total: {links.total}</p>
                 </div>
               </div>
             </div>
@@ -233,7 +249,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
               <div className="mt-2 text-sm text-gray-400">
                 <h2 className="text-white"> Density</h2>
                 <ul className="mt-2">
-                  {Object.entries(data.keywords.density).map(([key, value]) => (
+                  {Object.entries(keywords.density).map(([key, value]) => (
                     <li key={key}>
                       <p>
                         {key}: {value}{" "}
@@ -244,7 +260,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                 <div className="mt-2">
                   <h2 className="text-white">Prominent </h2>
                   <ul className="mt-2">
-                    {data.keywords.prominent.map((e, index) => (
+                    {keywords.prominent.map((e, index) => (
                       <li key={index}>
                         <span>{e}</span>
                       </li>
@@ -260,88 +276,88 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
               </p>
             </div>
             <Divider />
-            {data.social && (
+            {social && (social.openGraph || social.twitterCard) && (
               <>
                 <div>
                   <h2 className="manrope">Socials</h2>
                   <div className="mt-2 text-sm text-gray-400">
                     <div className="flex items-start justify-between gap-4 mt-2">
-                      {data.social && data.social.openGraph && (
+                      {social.openGraph && (
                         <div className="border border-white/20 rounded w-full p-2">
                           <h2 className="text-white">Open Graph</h2>
                           <div className="mt-2 border border-white/20 rounded p-2 ">
-                            {data.social.openGraph?.site_name && (
+                            {social.openGraph?.site_name && (
                               <p className="mt-2">
                                 <span className="text-white">Site Name: </span>
-                                {data.social.openGraph?.site_name}
+                                {social.openGraph?.site_name}
                               </p>
                             )}
-                            {data.social.openGraph?.title && (
+                            {social.openGraph?.title && (
                               <p className="mt-2">
                                 <span className="text-white">Title: </span>
-                                {data.social.openGraph?.title}
+                                {social.openGraph?.title}
                               </p>
                             )}
-                            {data.social.openGraph?.description && (
+                            {social.openGraph?.description && (
                               <p className="text-sm mt-2">
                                 <span className="text-white">
                                   Description:{" "}
                                 </span>
-                                {data.social.openGraph?.description}
+                                {social.openGraph?.description}
                               </p>
                             )}
-                            {data.social.openGraph?.locale && (
+                            {social.openGraph?.locale && (
                               <p className="mt-2">
                                 <span className="text-white">Locale: </span>
-                                {data.social.openGraph?.locale}
+                                {social.openGraph?.locale}
                               </p>
                             )}
-                            {data.social.openGraph?.image && (
+                            {social.openGraph?.image && (
                               <p className="mt-2">
                                 <span className="text-white">
                                   Open Graph Image:{" "}
                                 </span>
-                                {data.social.openGraph?.image}
+                                {social.openGraph?.image}
                               </p>
                             )}
-                            {data.social.openGraph?.type && (
+                            {social.openGraph?.type && (
                               <p className="mt-2">
                                 <span className="text-white">Type: </span>
-                                {data.social.openGraph?.type}
+                                {social.openGraph?.type}
                               </p>
                             )}
                           </div>
                         </div>
                       )}
 
-                      {data.social && data.social.twitterCard && (
+                      {social.twitterCard && (
                         <div className="border border-white/20 rounded w-full p-2">
                           <h2 className="text-white">Twitter Card</h2>
                           <div className="mt-2 border border-white/20 rounded p-2">
-                            {data.social.twitterCard?.title && (
+                            {social.twitterCard?.title && (
                               <p className="mt-2">
                                 <span className="text-white">Title: </span>
-                                {data.social.twitterCard?.title}
+                                {social.twitterCard?.title}
                               </p>
                             )}
-                            {data.social.twitterCard?.description && (
+                            {social.twitterCard?.description && (
                               <p className="mt-2">
                                 <span className="text-white">
                                   Description:{" "}
                                 </span>
-                                {data.social.twitterCard?.description}
+                                {social.twitterCard?.description}
                               </p>
                             )}
-                            {data.social.twitterCard?.image && (
+                            {social.twitterCard?.image && (
                               <p className="mt-2">
                                 <span className="text-white">Image: </span>
-                                {data.social.twitterCard?.image}
+                                {social.twitterCard?.image}
                               </p>
                             )}
-                            {data.social.twitterCard?.card && (
+                            {social.twitterCard?.card && (
                               <p className="mt-2">
                                 <span className="text-white">Card: </span>
-                                {data.social.twitterCard?.card}
+                                {social.twitterCard?.card}
                               </p>
                             )}
                           </div>
@@ -355,8 +371,8 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
             )}
             <div>
               <h2 className="manrope text-3xl font-bold">Mobile Preview</h2>
-              {data.mobile && data.mobile.rendering ? (
-                <MobilePreview rendering={data.mobile.rendering} />
+              {mobile && mobile.rendering ? (
+                <MobilePreview rendering={mobile.rendering} />
               ) : (
                 <p className="text-gray-400">No mobile preview available.</p>
               )}
@@ -371,19 +387,19 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                     <p>
                       Mobile Friendly:{" "}
                       <span className="text-white">
-                        {data.mobile.friendly ? "Yes" : "No"}
+                        {mobile.friendly ? "Yes" : "No"}
                       </span>
                     </p>
                     <p>
                       Tap Targets:{" "}
                       <span className="text-white">
-                        {data.mobile.tapTargets ? "Yes" : "No"}
+                        {mobile.tapTargets ? "Yes" : "No"}
                       </span>
                     </p>
                     <p>
                       Viewport:{" "}
                       <span className="text-white">
-                        {data.mobile.viewport ? "Yes" : "No"}
+                        {mobile.viewport ? "Yes" : "No"}
                       </span>
                     </p>
                   </div>
@@ -394,19 +410,19 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                     <p>
                       Load Time:{" "}
                       <span className="text-white">
-                        {data.performance.loadTime.toFixed() ?? 0} ms
+                        {perf.loadTime?.toFixed() ?? 0} ms
                       </span>
                     </p>
                     <p>
                       Page Size:{" "}
                       <span className="text-white">
-                        {data.performance.pageSize ?? "unknown"} kb
+                        {perf.pageSize ?? "unknown"} kb
                       </span>
                     </p>
                     <p>
                       Request:{" "}
                       <span className="text-white">
-                        {data.performance.requests ?? 0}
+                        {perf.requests ?? 0}
                       </span>
                     </p>
                   </div>
@@ -417,19 +433,19 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                     <p>
                       Canonical:{" "}
                       <span className="text-white">
-                        {data.structure.canonical ?? "None"}
+                        {structure.canonical ?? "None"}
                       </span>
                     </p>
                     <p>
                       Language:{" "}
                       <span className="text-white">
-                        {data.structure.lang ?? "EN"}
+                        {structure.lang ?? "EN"}
                       </span>
                     </p>
                     <p>
                       Schema Markup:{" "}
                       <span className="text-white">
-                        {data.structure.schemaMarkup ? "Yes" : "No"}
+                        {structure.schemaMarkup ? "Yes" : "No"}
                       </span>
                     </p>
                   </div>
@@ -441,7 +457,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                   Warnings
                 </h2>
                 <ul className="mt-2">
-                  {data.warnings.map((e, index) => (
+                  {warnings.map((e, index) => (
                     <li key={index} className="text-sm text-gray-400">
                       {index + 1}. {e}
                     </li>
@@ -454,7 +470,7 @@ const SEOResults: React.FC<SEOResultsDataI> = ({
                   Suggestions
                 </h2>
                 <ul className="mt-2">
-                  {data.suggestions.map((e, index) => (
+                  {suggestions.map((e, index) => (
                     <li key={index} className="text-sm text-gray-400">
                       {index + 1}. {e}
                     </li>

@@ -42,11 +42,10 @@ export async function POST(
         };
         const decoded = jwt.verify(data.user.token, environments.JWT) as {
           userID?: string;
-          password?: string;
           exp?: number;
         };
         const accessToken: string = jwt.sign(
-          { userID: decoded.userID, password: decoded.password },
+          { userID: decoded.userID },
           environments.JWT,
           { expiresIn: "1h" }
         );
@@ -159,11 +158,10 @@ export async function POST(
         };
         const decoded = jwt.verify(data.user.token, environments.JWT) as {
           userID?: string;
-          password?: string;
           exp?: number;
         };
         const accessToken: string = jwt.sign(
-          { userID: decoded.userID, password: decoded.password },
+          { userID: decoded.userID },
           environments.JWT,
           { expiresIn: "1h" }
         );

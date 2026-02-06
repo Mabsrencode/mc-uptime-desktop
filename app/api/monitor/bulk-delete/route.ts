@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import environments from "@/lib/environment";
+import { handleUnauthorizedResponse } from "@/lib/handleUnauthorized";
 import { cookies } from "next/headers";
 
 export async function DELETE(req: Request) {
@@ -22,21 +23,24 @@ export async function DELETE(req: Request) {
     }
 
     const response = await fetch(
-      `${environments.API_URL}/site/bulk-delete?ids=${ids}`,
+      `${environments.API_URL}/site/bulk-delete`,
       {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
+        body: JSON.stringify({ ids: ids.split(",") }),
       }
     );
 
+    const data = await response.json();
+    const unauthorizedResponse = await handleUnauthorizedResponse(response);
+    if (unauthorizedResponse) return unauthorizedResponse;
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Backend error:", errorData);
+      console.error("Backend error:", data);
       return NextResponse.json(
-        { message: "Backend error", error: errorData },
+        { message: "Backend error", error: data },
         { status: response.status }
       );
     }

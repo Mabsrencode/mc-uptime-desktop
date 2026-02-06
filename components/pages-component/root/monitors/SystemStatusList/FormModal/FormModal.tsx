@@ -2,6 +2,7 @@ import Divider from "@/components/reusable/Divider/Divider";
 import icons from "@/constants/icons";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { authFetch } from "@/lib/authFetch";
 import Image from "next/image";
 import React, { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -102,7 +103,7 @@ const FormModal: React.FC<{ setShowFormModal: (value: boolean) => void }> = ({
 
   const handleAddURL = useMutation({
     mutationFn: async (values: FormValues) => {
-      const response = await fetch("/api/monitor", {
+      const response = await authFetch("/api/monitor", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

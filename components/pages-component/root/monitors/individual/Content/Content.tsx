@@ -3,6 +3,7 @@ import "./style.css";
 import ResponseTimeGraph from "@/components/reusable/ResponseTimeGraph/ResponseTimeGraph";
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { authFetch } from "@/lib/authFetch";
 import { subDays, startOfDay, endOfDay } from "date-fns";
 import { BsThreeDots } from "react-icons/bs";
 import {
@@ -37,7 +38,7 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
   const router = useRouter();
 
   const handleGetMonitor = async () => {
-    const response = await fetch(
+    const response = await authFetch(
       `/api/monitor/monitor-status?siteId=${siteId}`
     );
     if (!response.ok) throw new Error("Failed to fetch monitor status");
@@ -79,7 +80,7 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
     error: string;
     details: string;
   }) => {
-    const response = await fetch("/api/monitor/monitor-status", {
+    const response = await authFetch("/api/monitor/monitor-status", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -121,7 +122,7 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
 
   const handleAnalyzeSEO = async () => {
     if (!data) return;
-    const response = await fetch(`/api/monitor/analyze-seo`, {
+    const response = await authFetch(`/api/monitor/analyze-seo`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -129,6 +130,7 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
       body: JSON.stringify({
         url: data.url,
         followRedirects: isFollowRedirect,
+        renderMobile: true,
       }),
     });
     if (!response.ok) throw new Error("Failed to analyze SEO");
@@ -153,7 +155,7 @@ const Content: React.FC<{ siteId: string }> = React.memo(({ siteId }) => {
 
   const handleAnalyzePerformance = async () => {
     if (!data) return;
-    const response = await fetch(`/api/monitor/analyze-performance`, {
+    const response = await authFetch(`/api/monitor/analyze-performance`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

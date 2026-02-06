@@ -2,6 +2,7 @@
 import PingStatus from "@/components/reusable/PingStatus/PingStatus";
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
 import { useQuery } from "@tanstack/react-query";
+import { authFetch } from "@/lib/authFetch";
 import Link from "next/link";
 import React, { useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
@@ -45,7 +46,7 @@ const Content: React.FC<{ incidentId: string }> = ({ incidentId }) => {
   };
 
   const handleGetIncident = async () => {
-    const response = await fetch(
+    const response = await authFetch(
       `/api/monitor/incident?incidentId=${incidentId}`
     );
 

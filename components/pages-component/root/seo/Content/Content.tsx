@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import SEOResults from "../../monitors/individual/SEOResults/SEOResults";
 import { useDebouncedState } from "@/hooks/useDebouncedState";
 import regex from "@/helper/regex";
+import { authFetch } from "@/lib/authFetch";
 
 const Content = () => {
   const [url, setUrl, cancelUrlUpdate] = useDebouncedState<string>("");
@@ -22,7 +23,7 @@ const Content = () => {
     }
 
     try {
-      const response = await fetch(`/api/monitor/analyze-seo`, {
+      const response = await authFetch(`/api/monitor/analyze-seo`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url, followRedirects: isFollowRedirects }),
@@ -46,8 +47,12 @@ const Content = () => {
     isPending: isAnalyzingSEO,
   } = useMutation({
     mutationFn: handleAnalyzeSEO,
-    onSuccess: () => {
-      toast.success("Analyzing SEO Successfully.");
+    onSuccess: (data) => {
+      if (data?.error) {
+        toast.error(data.error);
+      } else {
+        toast.success("Analyzing SEO Successfully.");
+      }
       setShowAnalyzeSEOReport(true);
     },
     onError: (error) => {

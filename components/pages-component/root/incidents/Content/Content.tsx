@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useQuery } from "@tanstack/react-query";
+import { authFetch } from "@/lib/authFetch";
 import { useRouter } from "next/navigation";
 import TableStatus from "@/components/reusable/TableStatus/TableStatus";
 import UptimeLoading from "@/components/reusable/UptimeLoading/UptimeLoading";
@@ -58,7 +59,7 @@ const Content = () => {
   ) => {
     const response =
       userId &&
-      (await fetch(
+      (await authFetch(
         `/api/monitor/incidents?userId=${userId}&search=${searchTerm}&type=${type}&status=${status}&page=${page}&perPage=${perPage}`
       ));
     if (!response) throw new Error("Something went wrong from the server.");

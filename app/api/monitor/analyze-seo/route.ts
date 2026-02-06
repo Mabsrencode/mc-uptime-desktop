@@ -1,4 +1,5 @@
 import environments from "@/lib/environment";
+import { handleUnauthorizedResponse } from "@/lib/handleUnauthorized";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -11,24 +12,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
     const body = await req.json();
-    const { url, followRedirects } = body;
+    const { url, followRedirects, renderMobile } = body;
     if (!url) {
       return NextResponse.json({ message: "URL is required" }, { status: 400 });
     }
-    const response = await fetch(`${environments.API_URL}/analyze-seo/`, {
+    const response = await fetch(`${environments.API_URL}/analyze-seo`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ url, followRedirects }),
+      body: JSON.stringify({ url, followRedirects, renderMobile }),
     });
     const data = await response.json();
+    const unauthorizedResponse = await handleUnauthorizedResponse(response);
+    if (unauthorizedResponse) return unauthorizedResponse;
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("Encore API error:", errorData);
+      console.error("NestJS API error:", data);
       return NextResponse.json(
-        { message: "Error fetching data", error: errorData },
+        { message: "Error fetching data", error: data },
         { status: response.status }
       );
     }
